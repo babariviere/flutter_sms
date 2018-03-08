@@ -31,6 +31,7 @@ public class SmsReceiver implements StreamHandler {
   @Override
   public void onListen(Object arguments, EventSink events) {
     receiver = createSmsReceiver(events);
+    // TODO: close stream if we don't have permission
     registrar.context().registerReceiver(receiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
   }
 
