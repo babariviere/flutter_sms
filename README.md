@@ -20,7 +20,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 ## Roadmap
 
 - [x] Sms Receiver
-- [ ] Sms Sender
+- [x] Sms Sender
 - [ ] Sms Delivery
 - [ ] Sms Query
 - [ ] MMS Receiver
