@@ -47,7 +47,8 @@ class SmsMessage {
 /// Usage:
 ///
 /// ```dart
-/// SmsReceiver().onSmsReceived.listen((SmsMessage msg) => ...);
+/// var receiver = SmsReceiver();
+/// receiver.onSmsReceived.listen((SmsMessage msg) => ...);
 /// ```
 class SmsReceiver {
   static SmsReceiver _instance;
