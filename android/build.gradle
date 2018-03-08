@@ -1,4 +1,4 @@
-group 'com.babariviere.smsplugin'
+group 'com.babariviere.sms'
 version '1.0-SNAPSHOT'
 
 buildscript {

@@ -1,12 +1,15 @@
-name: sms_plugin
-description: SMS in flutter.
+name: sms
+description: SMS library
 version: 0.0.1
-author:
-homepage:
+author: "babariviere <babariviere@protonmail.com>"
+homepage: "https://github.com/babariviere/flutter_sms"
 
 dependencies:
   flutter:
     sdk: flutter
+
+environment:
+  sdk: ">=1.0.0 <2.0.0"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -14,7 +17,7 @@ dependencies:
 # The following section is specific to Flutter.
 flutter:
   plugin:
-    androidPackage: com.babariviere.smsplugin
+    androidPackage: com.babariviere.sms
     pluginClass: SmsPlugin
 
   # To add assets to your plugin package, add an assets section, like this:

@@ -1,6 +1,6 @@
-# sms_plugin
+# sms
 
-SMS in flutter.
+SMS library
 
 ## Getting Started
 

@@ -1,6 +1,6 @@
-# sms_plugin_example
+# sms_example
 
-Demonstrates how to use the sms_plugin plugin.
+Demonstrates how to use the sms plugin.
 
 ## Getting Started
 
