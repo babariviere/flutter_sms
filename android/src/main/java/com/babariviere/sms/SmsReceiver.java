@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -74,9 +75,9 @@ public class SmsReceiver implements StreamHandler {
           }
           for (SmsMessage msg: msgs) {
             JSONObject obj = new JSONObject();
-            obj.put("sender", msg.getOriginatingAddress());
+            obj.put("address", msg.getOriginatingAddress());
             obj.put("body", msg.getMessageBody());
-            events.success(obj.toString());
+            events.success(obj);
           }
         } catch (Exception e) {}
       }

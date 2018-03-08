@@ -1,6 +1,6 @@
 name: sms
 description: SMS library
-version: 0.0.1
+version: 0.0.2
 author: "babariviere <babariviere@protonmail.com>"
 homepage: "https://github.com/babariviere/flutter_sms"
 
@@ -10,6 +10,18 @@ dependencies:
 
 environment:
   sdk: ">=1.0.0 <2.0.0"
+
+analyzer:
+  strong-mode: true
+
+linter:
+  rules:
+    - camel_case_types
+    - hash_and_equals
+    - iterable_contains_unrelated_type
+    - list_remove_unrelated_type
+    - unrelated_type_equality_checks
+    - valid_regexps
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
