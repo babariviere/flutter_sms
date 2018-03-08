@@ -27,6 +27,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 - [ ] MMS Sender
 - [ ] MMS Delivery
 - [ ] MMS Query
+- [ ] Multi Sim Card
 
 ## Contributions
 
