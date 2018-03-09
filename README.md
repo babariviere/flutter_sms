@@ -23,6 +23,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 - [ ] MMS Delivery
 - [ ] MMS Query
 - [ ] Multi Sim Card
+- [ ] Contact
 
 ## Contributions
 

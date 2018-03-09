@@ -199,6 +199,9 @@ class SmsReceiver {
   SmsReceiver._private(this._channel);
 
   /// Create a stream that collect received SMS
+  ///
+  /// Warning: this function only create fields address and body in SMS Message
+  /// If you want to get thread id and else, you have to use SmsQuery
   Stream<SmsMessage> get onSmsReceived {
     if (_onSmsReceived == null) {
       print("Creating sms receiver");
