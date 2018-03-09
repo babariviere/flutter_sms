@@ -146,8 +146,15 @@ class SmsThread {
     }
   }
 
-  /// Add a message
+  /// Add a message at the end
   void addMessage(SmsMessage msg) {
+    if (msg.threadId == _id) {
+      _messages.add(msg);
+    }
+  }
+
+  /// Add a message at the start
+  void addNewMessage(SmsMessage msg) {
     if (msg.threadId == _id) {
       _messages.insert(0, msg);
     }
