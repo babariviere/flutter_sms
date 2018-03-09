@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription<SmsMessage> _smsSubscription;
 
   void readSms() async {
-    SmsQuery query = SmsQuery();
+    SmsQuery query = new SmsQuery();
     List<SmsMessage> msgs = await query.querySms(
         start: 0,
         count: 2,
@@ -72,50 +72,50 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Plugin example app'),
+    return new MaterialApp(
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text('Plugin example app'),
         ),
-        body: Column(
+        body: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Card(
-                child: Container(
+            new Card(
+                child: new Container(
                   child: new Text(text),
-                  padding: EdgeInsets.all(10.0),
+                  padding: new EdgeInsets.all(10.0),
                 )
             ),
-            Card(
-                child: Container(
-                  child: Column(
+            new Card(
+                child: new Container(
+                  child: new Column(
                     children: <Widget>[
-                      TextField(
+                      new TextField(
                         controller: _controller,
-                        decoration: InputDecoration(
+                        decoration: new InputDecoration(
                             border: InputBorder.none,
-                            labelStyle: TextStyle(fontSize: 16.0),
+                            labelStyle: new TextStyle(fontSize: 16.0),
                             labelText: "Reply with:"
                         ),
                       ),
-                      RaisedButton(
+                      new RaisedButton(
                         onPressed: () {
                           var text = _controller.text;
                           _controller.clear();
-                          SmsMessage msg = SmsMessage(lastMessage.sender, text);
+                          SmsMessage msg = new SmsMessage(lastMessage.sender, text);
                           sender.sendSms(msg, onError: (Object e) => print(e));
                         },
-                        child: Text("REPLY"),
+                        child: new Text("REPLY"),
                       )
                     ],
                   ),
-                  padding: EdgeInsets.all(10.0),
+                  padding: new EdgeInsets.all(10.0),
                 )
             ),
-            Card(
-              child: Container(
-                child: Text(smsList),
-                padding: EdgeInsets.all(10.0),
+            new Card(
+              child: new Container(
+                child: new Text(smsList),
+                padding: new EdgeInsets.all(10.0),
               ),
             )
           ],

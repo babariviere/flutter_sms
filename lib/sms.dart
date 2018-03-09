@@ -54,10 +54,10 @@ class SmsMessage implements Comparable<SmsMessage> {
       this._read = data["read"] as int == 1;
     }
     if (data.containsKey("date")) {
-      this._date =  DateTime.fromMillisecondsSinceEpoch(data["date"]);
+      this._date =  new DateTime.fromMillisecondsSinceEpoch(data["date"]);
     }
     if (data.containsKey("date_sent")) {
-      this._dateSent = DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+      this._dateSent = new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
   }
 
@@ -155,7 +155,7 @@ class SmsReceiver {
       print("Creating sms receiver");
       _onSmsReceived = _channel.receiveBroadcastStream().map(
               (dynamic event) {
-                SmsMessage msg = SmsMessage.fromJson(event);
+                SmsMessage msg = new SmsMessage.fromJson(event);
                 msg.kind = SmsMessageKind.Received;
                 return msg;
               }
@@ -266,9 +266,9 @@ class SmsQuery {
       msgKind = SmsMessageKind.Draft;
     }
     return await _channel.invokeMethod(function, arguments).then((dynamic val) {
-      var list = List<SmsMessage>();
+      List<SmsMessage> list = [];
       for (Map data in val) {
-        SmsMessage msg = SmsMessage.fromJson(data);
+        SmsMessage msg = new SmsMessage.fromJson(data);
         msg.kind = msgKind;
         list.add(msg);
       }
