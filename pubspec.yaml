@@ -1,6 +1,6 @@
 name: sms
 description: SMS library
-version: 0.0.3
+version: 0.0.4
 author: "babariviere <babariviere@protonmail.com>"
 homepage: "https://github.com/babariviere/flutter_sms"
 
