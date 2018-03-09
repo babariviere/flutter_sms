@@ -10,8 +10,9 @@ import android.os.Build;
 
 
 class Permissions {
-  public static final int RECV_SMS_ID_REQ = 1;
-  public static final int SEND_SMS_ID_REQ = 2;
+  static final int RECV_SMS_ID_REQ = 1;
+  static final int SEND_SMS_ID_REQ = 2;
+  static final int READ_SMS_ID_REQ = 3;
   private final Activity activity;
 
   Permissions(Activity activity) {

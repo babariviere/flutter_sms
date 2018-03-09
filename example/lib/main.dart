@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sms/sms.dart';
 
 void main() => runApp(new MyApp());
@@ -16,29 +15,53 @@ class _MyAppState extends State<MyApp> {
   SmsSender sender = new SmsSender();
   TextEditingController _controller;
   SmsMessage lastMessage = new SmsMessage(null, "No new messages");
-  String text = "stream not opened";
+  String text = "";
+  String smsList = "Readed SMS at start:\n";
   StreamSubscription<SmsMessage> _smsSubscription;
+
+  void readSms() async {
+    SmsQuery query = SmsQuery();
+    List<SmsMessage> msgs = await query.querySms(
+        start: 0, count: 2, kind: SmsQueryKind.Sent, onError: (Object e) => print(e.toString()) );
+    for (var msg in msgs) {
+      setState(() {
+        smsList +=
+            msg.threadId.toString() + " => " + msg.address + ": " + msg.body +
+                "\n";
+        if (text.isEmpty) {
+          lastMessage = msg;
+          text = "sender: " +
+              (lastMessage.sender == null ? "null" : lastMessage
+                  .sender) +
+              "\nbody: " +
+              lastMessage.body;
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _controller = new TextEditingController();
-    text = "Stream is open";
+    text = "";
     _smsSubscription = receiver.onSmsReceived.listen((SmsMessage msg) {
       print("Receive new msg");
       setState(() {
         lastMessage = msg;
         text = "sender: " +
-                (lastMessage.sender == null ? "null" : lastMessage
-                    .sender) +
-                "\nbody: " +
-                lastMessage.body;
+            (lastMessage.sender == null ? "null" : lastMessage
+                .sender) +
+            "\nbody: " +
+            lastMessage.body;
       });
     }, onError: (Object err) {
       print(err);
       setState(() => text = err.toString());
     });
-    _smsSubscription.onDone(() => setState(() => text = "Stream in now closed"));
+    _smsSubscription.onDone(() =>
+        setState(() => text = "Stream in now closed"));
+    readSms();
   }
 
   @override
@@ -82,6 +105,12 @@ class _MyAppState extends State<MyApp> {
                   ),
                   padding: EdgeInsets.all(10.0),
                 )
+            ),
+            Card(
+              child: Container(
+                child: Text(smsList),
+                padding: EdgeInsets.all(10.0),
+              ),
             )
           ],
         ),

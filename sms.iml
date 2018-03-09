@@ -19,6 +19,8 @@
       <excludeFolder url="file://$MODULE_DIR$/example/android/.gradle/4.1/taskHistory/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/android/.gradle/buildOutputCleanup/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/android/.gradle/packages" />
+      <excludeFolder url="file://$MODULE_DIR$/example/android/.settings/packages" />
+      <excludeFolder url="file://$MODULE_DIR$/example/android/app/.settings/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/android/app/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/android/app/src/main/java/com/babariviere/packages" />
       <excludeFolder url="file://$MODULE_DIR$/example/android/app/src/main/java/com/babariviere/smsexample/packages" />
