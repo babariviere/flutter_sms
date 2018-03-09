@@ -11,6 +11,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class SmsPlugin {
   private static final String CHANNEL_RECV = "plugins.babariviere.com/recvSMS";
   private static final String CHANNEL_SEND = "plugins.babariviere.com/sendSMS";
+  private static final String CHANNEL_QUER = "plugins.babariviere.com/querySMS";
 
   /**
    * Plugin registration.
@@ -27,5 +28,10 @@ public class SmsPlugin {
     final MethodChannel sendSmsChannel = new MethodChannel(registrar.messenger(),
         CHANNEL_SEND, JSONMethodCodec.INSTANCE);
     sendSmsChannel.setMethodCallHandler(sender);
+
+    /// SMS query
+    final SmsQuery query = new SmsQuery(registrar);
+    final MethodChannel querySmsChannel = new MethodChannel(registrar.messenger(), CHANNEL_QUER, JSONMethodCodec.INSTANCE);
+    querySmsChannel.setMethodCallHandler(query);
   }
 }

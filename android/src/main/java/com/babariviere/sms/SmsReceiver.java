@@ -16,21 +16,22 @@ import org.json.JSONObject;
 
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
-import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
+
+import static io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * Created by babariviere on 08/03/18.
  */
 
 class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
-  private final PluginRegistry.Registrar registrar;
+  private final Registrar registrar;
   private BroadcastReceiver receiver;
   private final Permissions permissions;
   private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS};
   private EventSink sink;
 
-  SmsReceiver(PluginRegistry.Registrar registrar) {
+  SmsReceiver(Registrar registrar) {
     this.registrar = registrar;
     this.permissions = new Permissions(registrar.activity());
     registrar.addRequestPermissionsResultListener(this);

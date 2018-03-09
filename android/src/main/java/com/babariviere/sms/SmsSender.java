@@ -21,7 +21,7 @@ import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultLi
 class SmsSender implements MethodCallHandler, RequestPermissionsResultListener {
   private static final SmsManager sms = SmsManager.getDefault();
   private final Permissions permissions;
-  private final String[] permissions_list = new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE};
+  private final String[] permissionsList = new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE};
   private MethodChannel.Result result;
   private String address;
   private String body;
@@ -42,7 +42,7 @@ class SmsSender implements MethodCallHandler, RequestPermissionsResultListener {
       } else if (body == null) {
         result.error("#02", "missing argument 'body'", null);
       } else {
-        if (permissions.checkAndRequestPermission(permissions_list, Permissions.SEND_SMS_ID_REQ)) {
+        if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
           sms.sendTextMessage(address, null, body, null, null);
           result.success(null);
         }
