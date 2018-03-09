@@ -1,12 +1,13 @@
 package com.babariviere.sms;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -16,24 +17,32 @@ import org.json.JSONObject;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
 
 /**
  * Created by babariviere on 08/03/18.
  */
 
-public class SmsReceiver implements StreamHandler {
-  private PluginRegistry.Registrar registrar;
+class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
+  private final PluginRegistry.Registrar registrar;
   private BroadcastReceiver receiver;
+  private final Permissions permissions;
+  private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS};
+  private EventSink sink;
 
   SmsReceiver(PluginRegistry.Registrar registrar) {
     this.registrar = registrar;
+    this.permissions = new Permissions(registrar.activity());
+    registrar.addRequestPermissionsResultListener(this);
   }
 
+  @TargetApi(Build.VERSION_CODES.KITKAT)
   @Override
   public void onListen(Object arguments, EventSink events) {
     receiver = createSmsReceiver(events);
-    // TODO: close stream if we don't have permission
     registrar.context().registerReceiver(receiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
+    sink = events;
+    permissions.checkAndRequestPermission(permissionsList, Permissions.RECV_SMS_ID_REQ);
   }
 
   @Override
@@ -42,30 +51,15 @@ public class SmsReceiver implements StreamHandler {
     receiver = null;
   }
 
-  @TargetApi(Build.VERSION_CODES.DONUT)
+  @TargetApi(Build.VERSION_CODES.KITKAT)
   private SmsMessage[] readMessages(Intent intent) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
-      return msgs;
-    }
-    Bundle bundle = intent.getExtras();
-
-    if (bundle == null || !bundle.containsKey("pdus")) {
-      return null;
-    }
-    final Object pdus[] = (Object[]) bundle.get("pdus");
-    SmsMessage[] msgs = new SmsMessage[pdus.length];
-    int idx = 0;
-    for (Object pdu: pdus) {
-      msgs[idx] = SmsMessage.createFromPdu((byte[]) pdu);
-      idx++;
-    }
-    return msgs;
+    return Telephony.Sms.Intents.getMessagesFromIntent(intent);
   }
+
 
   private BroadcastReceiver createSmsReceiver(final EventSink events) {
     return new BroadcastReceiver() {
-      @TargetApi(Build.VERSION_CODES.DONUT)
+      @TargetApi(Build.VERSION_CODES.KITKAT)
       @Override
       public void onReceive(Context context, Intent intent) {
         try {
@@ -79,8 +73,23 @@ public class SmsReceiver implements StreamHandler {
             obj.put("body", msg.getMessageBody());
             events.success(obj);
           }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+          Log.d("SmsReceiver", e.toString());
+        }
       }
     };
+  }
+
+  @Override
+  public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    if (requestCode != Permissions.RECV_SMS_ID_REQ) {
+      return false;
+    }
+    if (grantResults.length > 0
+        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+      return true;
+    }
+    sink.endOfStream();
+    return false;
   }
 }
