@@ -1,3 +1,7 @@
+## [0.0.7] - 2018-03-09
+
+* Small fix for SMS thread
+
 ## [0.0.6] - 2018-03-09
 
 * Implementation of SMS thread

@@ -66,6 +66,12 @@ class _MyAppState extends State<MyApp> {
 //      val.keys.forEach((dynamic k) {
 //        print(k.toString());
 //      });
+//      val.values.forEach((dynamic v) {
+//        SmsThread t = v;
+//        t.messages.forEach((m) {
+//          print(m.address + ": " + m.body);
+//        });
+//      });
 //    });
   }
 
