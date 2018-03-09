@@ -2,7 +2,6 @@
 library sms;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
@@ -81,7 +80,7 @@ class SmsReceiver {
 /// Called when SMS is sent (don't check if it's delivered
 typedef void SmsHandlerSucc();
 /// Called when sending SMS failed
-typedef void SmsHandlerFail(String e);
+typedef void SmsHandlerFail(Object e);
 
 /// A SMS sender
 class SmsSender {
