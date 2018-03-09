@@ -16,7 +16,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 - [x] Sms Receiver
 - [x] Sms Sender
 - [ ] Sms Delivery
-- [ ] Sms Query
+- [x] Sms Query
 - [ ] MMS Receiver
 - [ ] MMS Sender
 - [ ] MMS Delivery
