@@ -11,20 +11,6 @@ For help getting started with Flutter, view our online
 
 For help on editing plugin code, view the [documentation](https://flutter.io/platform-plugins/#edit-code).
 
-### Receiving SMS
-
-```dart
-var receiver = SmsReceiver();
-receiver.onSmsReceived.listen((SmsMessage msg) => ...);
-```
-
-### Sender SMS
-
-```dart
-var sender = SmsSender();
-sender.sendSMS(SmsMessage('address', 'body'));
-```
-
 ## Roadmap
 
 - [x] Sms Receiver
