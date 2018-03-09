@@ -13,10 +13,11 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 
 ## Roadmap
 
-- [x] Sms Receiver
-- [x] Sms Sender
-- [ ] Sms Delivery
-- [x] Sms Query
+- [x] SMS Receiver
+- [x] SMS Sender
+- [ ] SMS Delivery
+- [x] SMS Query
+- [x] SMS Thread
 - [ ] MMS Receiver
 - [ ] MMS Sender
 - [ ] MMS Delivery

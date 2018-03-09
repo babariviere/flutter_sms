@@ -125,6 +125,47 @@ class SmsMessage implements Comparable<SmsMessage> {
   }
 }
 
+/// A SMS thread
+class SmsThread {
+  int _id;
+  List<SmsMessage> _messages = [];
+
+  SmsThread(int id) : this._id = id;
+
+  /// Create a thread from a list of message, the id will be taken from
+  /// the first message
+  SmsThread.fromMessages(List<SmsMessage> messages) {
+    if (messages == null || messages.length == 0) {
+      return;
+    }
+    this._id = messages[0].threadId;
+    for (var msg in messages) {
+      if (msg.threadId == _id) {
+        messages.add(msg);
+      }
+    }
+  }
+
+  /// Add a message
+  void addMessage(SmsMessage msg) {
+    if (msg.threadId == _id) {
+      _messages.insert(0, msg);
+    }
+  }
+
+  /// Get messages from thread
+  List<SmsMessage> get messages => this._messages;
+
+  /// Set messages in thread
+  set messages(List<SmsMessage> messages) => this._messages = messages;
+
+  /// Get thread id
+  int get id => this._id;
+
+  /// Get thread id (for compatibility)
+  int get threadId => this._id;
+}
+
 /// A SMS receiver that creates a stream of SMS
 ///
 ///
@@ -238,7 +279,7 @@ class SmsQuery {
       {int start,
       int count,
       int threadId,
-      SmsQueryKind kind,
+      SmsQueryKind kind: SmsQueryKind.Inbox,
       SmsHandlerFail onError}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
@@ -249,9 +290,6 @@ class SmsQuery {
     }
     if (threadId != null && threadId >= 0) {
       arguments["thread_id"] = threadId;
-    }
-    if (kind == null) {
-      kind = SmsQueryKind.Inbox;
     }
     String function;
     SmsMessageKind msgKind;
@@ -285,9 +323,9 @@ class SmsQuery {
       {int start,
       int count,
       int threadId,
-      List<SmsQueryKind> kinds,
+      List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
       SmsHandlerFail onError,
-      bool sort}) async {
+      bool sort: true}) async {
     List<SmsMessage> result = [];
     for (var kind in kinds) {
       result
@@ -298,14 +336,41 @@ class SmsQuery {
             kind: kind,
             onError: onError));
     }
-    if (sort == null || sort == true) {
+    if (sort == true) {
       result.sort((a, b) => a.compareTo(b));
     }
     return (result);
   }
 
+  /// Query multiple thread by id
+  Future<Map<int, SmsThread>> queryThreads(List<int> threadsId,
+      {List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
+      SmsHandlerFail onError}) async {
+    Map<int, SmsThread> map = {};
+    for (var id in threadsId) {
+      map[id] = new SmsThread(id);
+      map[id].messages =
+          await this.querySms(threadId: id, kinds: kinds, onError: onError);
+    }
+    return map;
+  }
+
+  /// Get all SMS
   Future<List<SmsMessage>> get getAllSms async {
     return this.querySms(
         kinds: [SmsQueryKind.Sent, SmsQueryKind.Inbox, SmsQueryKind.Draft]);
+  }
+
+  /// Get all threads
+  Future<Map<int, SmsThread>> get getAllThreads async {
+    List<SmsMessage> messages = await this.getAllSms;
+    Map<int, SmsThread> map = {};
+    messages.forEach((msg) {
+      if (!map.containsKey(msg.threadId)) {
+        map[msg.threadId] = new SmsThread(msg.threadId);
+      }
+      map[msg.threadId].addMessage(msg);
+    });
+    return map;
   }
 }
