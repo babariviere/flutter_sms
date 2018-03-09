@@ -1,3 +1,7 @@
+## [0.0.6] - 2018-03-09
+
+* Implementation of SMS thread
+
 ## [0.0.5] - 2018-03-09
 
 * Support for dart < 2.0.0
