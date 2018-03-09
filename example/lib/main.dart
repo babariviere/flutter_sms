@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                           var text = _controller.text;
                           _controller.clear();
                           SmsMessage msg = SmsMessage(lastMessage.sender, text);
-                          sender.sendSms(msg);
+                          sender.sendSms(msg, onError: (Object e) => print(e));
                         },
                         child: Text("REPLY"),
                       )

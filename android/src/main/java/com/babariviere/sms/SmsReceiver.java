@@ -85,8 +85,14 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
     if (requestCode != Permissions.RECV_SMS_ID_REQ) {
       return false;
     }
-    if (grantResults.length > 0
-        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    boolean isOk = true;
+    for (int res: grantResults) {
+      if (res != PackageManager.PERMISSION_GRANTED) {
+        isOk = false;
+        break;
+      }
+    }
+    if (isOk) {
       return true;
     }
     sink.endOfStream();

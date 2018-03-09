@@ -23,7 +23,7 @@ public class SmsPlugin {
     recvSmsChannel.setStreamHandler(receiver);
 
     /// SMS sender
-    final SmsSender sender = new SmsSender(registrar.activity());
+    final SmsSender sender = new SmsSender(registrar);
     final MethodChannel sendSmsChannel = new MethodChannel(registrar.messenger(),
         CHANNEL_SEND, JSONMethodCodec.INSTANCE);
     sendSmsChannel.setMethodCallHandler(sender);
