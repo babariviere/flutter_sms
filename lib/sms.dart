@@ -5,8 +5,14 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+enum SmsMessageKind {
+  Sent,
+  Received,
+  Draft,
+}
+
 /// A SMS Message
-class SmsMessage {
+class SmsMessage implements Comparable<SmsMessage> {
   int _id;
   int _threadId;
   String _address;
@@ -14,6 +20,7 @@ class SmsMessage {
   bool _read;
   DateTime _date;
   DateTime _dateSent;
+  SmsMessageKind _kind;
 
   SmsMessage(this._address, this._body,
       {int id, int threadId, bool read, DateTime date, DateTime dateSent}) {
@@ -104,6 +111,17 @@ class SmsMessage {
 
   /// Get date
   DateTime get date => this._date;
+
+  /// Get message kind
+  SmsMessageKind get kind => this._kind;
+
+  /// Set message kind
+  set kind(SmsMessageKind kind) => this._kind = kind;
+
+  @override
+  int compareTo(SmsMessage other) {
+    return other._id - this._id;
+  }
 }
 
 /// A SMS receiver that creates a stream of SMS
@@ -136,7 +154,11 @@ class SmsReceiver {
     if (_onSmsReceived == null) {
       print("Creating sms receiver");
       _onSmsReceived = _channel.receiveBroadcastStream().map(
-              (dynamic event) => SmsMessage.fromJson(event)
+              (dynamic event) {
+                SmsMessage msg = SmsMessage.fromJson(event);
+                msg.kind = SmsMessageKind.Received;
+                return msg;
+              }
       );
     }
     return _onSmsReceived;
@@ -216,8 +238,8 @@ class SmsQuery {
 
   SmsQuery._private(this._channel);
 
-  /// Query a list of SMS
-  Future<List<SmsMessage>> querySms({int start, int count, int threadId, SmsQueryKind kind, SmsHandlerFail onError}) async {
+  /// Wrapper for query only one kind
+  Future<List<SmsMessage>> _querySmsWrapper({int start, int count, int threadId, SmsQueryKind kind, SmsHandlerFail onError}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
       arguments["start"] = start;
@@ -228,20 +250,27 @@ class SmsQuery {
     if (threadId != null && threadId >= 0) {
       arguments["thread_id"] = threadId;
     }
-    String function = "getInbox";
-    if (kind != null) {
-      if (kind == SmsQueryKind.Inbox) {
-        function = "getInbox";
-      } else if (kind == SmsQueryKind.Sent) {
-        function = "getSent";
-      } else {
-        function = "getDraft";
-      }
+    if (kind == null) {
+      kind = SmsQueryKind.Inbox;
+    }
+    String function;
+    SmsMessageKind msgKind;
+    if (kind == SmsQueryKind.Inbox) {
+      function = "getInbox";
+      msgKind = SmsMessageKind.Received;
+    } else if (kind == SmsQueryKind.Sent) {
+      function = "getSent";
+      msgKind = SmsMessageKind.Sent;
+    } else {
+      function = "getDraft";
+      msgKind = SmsMessageKind.Draft;
     }
     return await _channel.invokeMethod(function, arguments).then((dynamic val) {
       var list = List<SmsMessage>();
       for (Map data in val) {
-        list.add(SmsMessage.fromJson(data));
+        SmsMessage msg = SmsMessage.fromJson(data);
+        msg.kind = msgKind;
+        list.add(msg);
       }
       return list;
     }, onError: (Object e) {
@@ -249,5 +278,21 @@ class SmsQuery {
         onError(e);
       }
     });
+  }
+
+  /// Query a list of SMS
+  Future<List<SmsMessage>> querySms({int start, int count, int threadId, List<SmsQueryKind> kinds, SmsHandlerFail onError, bool sort}) async {
+    List<SmsMessage> result = [];
+    for (var kind in kinds) {
+      result..addAll(await this._querySmsWrapper(start: start, count: count, threadId: threadId, kind: kind, onError: onError));
+    }
+    if (sort == null || sort == true) {
+      result.sort((a, b) => a.compareTo(b));
+    }
+    return (result);
+  }
+
+  Future<List<SmsMessage>> get getAllSms async {
+    return this.querySms(kinds: [SmsQueryKind.Sent, SmsQueryKind.Inbox, SmsQueryKind.Draft]);
   }
 }

@@ -22,7 +22,10 @@ class _MyAppState extends State<MyApp> {
   void readSms() async {
     SmsQuery query = SmsQuery();
     List<SmsMessage> msgs = await query.querySms(
-        start: 0, count: 2, kind: SmsQueryKind.Sent, onError: (Object e) => print(e.toString()) );
+        start: 0,
+        count: 2,
+        kinds: [SmsQueryKind.Sent],
+        onError: (Object e) => print(e.toString()));
     for (var msg in msgs) {
       setState(() {
         smsList +=
@@ -30,14 +33,20 @@ class _MyAppState extends State<MyApp> {
                 "\n";
         if (text.isEmpty) {
           lastMessage = msg;
-          text = "sender: " +
-              (lastMessage.sender == null ? "null" : lastMessage
-                  .sender) +
-              "\nbody: " +
+          text = "sender: " + lastMessage.sender.toString() + "\nbody: " +
               lastMessage.body;
         }
       });
     }
+    query.getAllSms.then((List<SmsMessage> msgs) {
+      int count = 0;
+      msgs.forEach((msg) {
+          print(msg.id.toString() + ": " + msg.kind.toString() + " => " +
+              msg.body + "\n");
+        count++;
+      });
+      print("Total: " + count.toString());
+    });
   }
 
   @override
@@ -49,10 +58,7 @@ class _MyAppState extends State<MyApp> {
       print("Receive new msg");
       setState(() {
         lastMessage = msg;
-        text = "sender: " +
-            (lastMessage.sender == null ? "null" : lastMessage
-                .sender) +
-            "\nbody: " +
+        text = "sender: " + lastMessage.sender.toString() + "\nbody: " +
             lastMessage.body;
       });
     }, onError: (Object err) {

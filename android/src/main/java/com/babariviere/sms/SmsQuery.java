@@ -59,6 +59,9 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
   @Override
   public void onMethodCall(MethodCall call, Result result) {
     this.result = result;
+    start = 0;
+    count = -1;
+    threadId = -1;
     switch (call.method) {
       case "getInbox":
         request = SmsQueryRequest.Inbox;
