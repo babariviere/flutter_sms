@@ -4,6 +4,7 @@ library sms;
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:sms/contact.dart';
 
 enum SmsMessageKind {
   Sent,
@@ -81,10 +82,10 @@ class SmsMessage implements Comparable<SmsMessage> {
       res["read"] = _read;
     }
     if (_date != null) {
-      res["date"] = _date;
+      res["date"] = _date.millisecondsSinceEpoch;
     }
     if (_dateSent != null) {
-      res["date_sent"] = _dateSent;
+      res["date_sent"] = _dateSent.millisecondsSinceEpoch;
     }
     return res;
   }
@@ -119,6 +120,9 @@ class SmsMessage implements Comparable<SmsMessage> {
   /// Set message kind
   set kind(SmsMessageKind kind) => this._kind = kind;
 
+  /// Set message date
+  set date(DateTime date) => this._date = date;
+
   @override
   int compareTo(SmsMessage other) {
     return other._id - this._id;
@@ -128,6 +132,8 @@ class SmsMessage implements Comparable<SmsMessage> {
 /// A SMS thread
 class SmsThread {
   int _id;
+  String _address;
+  Contact _contact;
   List<SmsMessage> _messages = [];
 
   SmsThread(int id) : this._id = id;
@@ -139,17 +145,22 @@ class SmsThread {
       return;
     }
     this._id = messages[0].threadId;
+    this._address = messages[0].address;
     for (var msg in messages) {
       if (msg.threadId == _id) {
         messages.add(msg);
       }
     }
+    this.findContact();
   }
 
   /// Add a message at the end
   void addMessage(SmsMessage msg) {
     if (msg.threadId == _id) {
       _messages.add(msg);
+      if (this._address == null) {
+        this._address = msg.address;
+      }
     }
   }
 
@@ -157,11 +168,26 @@ class SmsThread {
   void addNewMessage(SmsMessage msg) {
     if (msg.threadId == _id) {
       _messages.insert(0, msg);
+      if (this._address == null) {
+        this._address = msg.address;
+      }
+    }
+  }
+
+  /// Set contact through contact query
+  void findContact() async {
+    ContactQuery query = new ContactQuery();
+    Contact contact = await query.queryContact(this._address, onError: (Object e) => print(e.toString()));
+    if (contact != null) {
+      this._contact = contact;
     }
   }
 
   /// Get messages from thread
   List<SmsMessage> get messages => this._messages;
+
+  /// Get address
+  String get address => this._address;
 
   /// Set messages in thread
   set messages(List<SmsMessage> messages) => this._messages = messages;
@@ -171,6 +197,12 @@ class SmsThread {
 
   /// Get thread id (for compatibility)
   int get threadId => this._id;
+
+  /// Get contact info
+  Contact get contact => this._contact;
+
+  /// Set contact info
+  set contact(Contact contact) => this._contact = contact;
 }
 
 /// A SMS receiver that creates a stream of SMS
@@ -199,9 +231,6 @@ class SmsReceiver {
   SmsReceiver._private(this._channel);
 
   /// Create a stream that collect received SMS
-  ///
-  /// Warning: this function only create fields address and body in SMS Message
-  /// If you want to get thread id and else, you have to use SmsQuery
   Stream<SmsMessage> get onSmsReceived {
     if (_onSmsReceived == null) {
       print("Creating sms receiver");
@@ -240,6 +269,8 @@ class SmsSender {
   /// Send an SMS
   ///
   /// Take a message in argument + 2 functions that will be called on success or on error
+  ///
+  /// This function will not set automatically thread id, you have to do it
   Future<Null> sendSms(SmsMessage msg,
       {SmsHandlerSucc onSuccess, SmsHandlerFail onError}) async {
     if (msg == null || msg.address == null || msg.body == null) {
@@ -255,6 +286,7 @@ class SmsSender {
       return;
     }
     await _channel.invokeMethod("sendSMS", msg.toMap).then((dynamic val) {
+      msg.date = new DateTime.now();
       if (onSuccess != null) {
         onSuccess();
       }
@@ -375,6 +407,7 @@ class SmsQuery {
   Future<Map<int, SmsThread>> get getAllThreads async {
     List<SmsMessage> messages = await this.getAllSms;
     Map<int, SmsThread> map = {};
+    // TODO: change method for this, this should call findContact()
     messages.forEach((msg) {
       if (!map.containsKey(msg.threadId)) {
         map[msg.threadId] = new SmsThread(msg.threadId);

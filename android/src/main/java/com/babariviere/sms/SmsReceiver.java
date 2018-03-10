@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -72,6 +73,9 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
             JSONObject obj = new JSONObject();
             obj.put("address", msg.getOriginatingAddress());
             obj.put("body", msg.getMessageBody());
+            obj.put("date", msg.getTimestampMillis());
+            obj.put("read", (msg.getStatusOnIcc() == SmsManager.STATUS_ON_ICC_READ) ? 1 : 0);
+            obj.put("thread_id", TelephonyCompat.getOrCreateThreadId(context, msg.getOriginatingAddress()));
             events.success(obj);
           }
         } catch (Exception e) {
