@@ -177,7 +177,8 @@ class SmsThread {
   /// Set contact through contact query
   void findContact() async {
     ContactQuery query = new ContactQuery();
-    Contact contact = await query.queryContact(this._address, onError: (Object e) => print(e.toString()));
+    Contact contact = await query.queryContact(this._address,
+        onError: (Object e) => print(e.toString()));
     if (contact != null) {
       this._contact = contact;
     }
