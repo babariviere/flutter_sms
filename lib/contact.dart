@@ -25,8 +25,7 @@ class Contact {
 
   Contact.fromJson(String address, Map data) {
     this._address = address;
-    if (data == null)
-      return;
+    if (data == null) return;
     if (data.containsKey("first")) {
       this._firstName = data["first"];
     }
@@ -87,17 +86,16 @@ class ContactQuery {
       return null;
     }
     inProgress[address] = true;
-    return await _channel.invokeMethod("getContact", {"address": address})
-        .then((dynamic val) {
+    return await _channel.invokeMethod("getContact", {"address": address}).then(
+        (dynamic val) {
       Contact contact = new Contact.fromJson(address, val);
       queried[address] = contact;
       inProgress[address] = false;
       return contact;
-    },
-        onError: (Object e) {
-          if (onError != null) {
-            onError(e);
-          }
-        });
+    }, onError: (Object e) {
+      if (onError != null) {
+        onError(e);
+      }
+    });
   }
 }
