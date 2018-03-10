@@ -1,3 +1,8 @@
+## [0.0.8] - 2018-03-10
+
+* SmsReceiver creates all needed field
+* Add basic contact support
+
 ## [0.0.7] - 2018-03-09
 
 * Small fix for SMS thread
