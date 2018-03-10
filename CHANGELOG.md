@@ -1,3 +1,8 @@
+## [0.0.9] - 2018-03-10
+
+* SmsDelivery report
+* Automatically assign contact to created SmsThread
+
 ## [0.0.8] - 2018-03-10
 
 * SmsReceiver creates all needed field

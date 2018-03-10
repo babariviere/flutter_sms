@@ -6,8 +6,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,12 +67,6 @@ class ContactQuery implements MethodCallHandler, RequestPermissionsResultListene
     if (cursor != null) {
       if (cursor.moveToFirst()) {
         try {
-          Log.d("COUNT", (cursor.getColumnCount()) + "");
-          for (int i = 0; i < cursor.getColumnCount(); i++) {
-            if (cursor.getString(i) != null) {
-              Log.d("DEBUG", cursor.getString(i));
-            }
-          }
           obj.put("name", cursor.getString(0));
           obj.put("last", cursor.getString(1));
           obj.put("first", cursor.getString(2));

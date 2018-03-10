@@ -148,7 +148,7 @@ class SmsThread {
     this._address = messages[0].address;
     for (var msg in messages) {
       if (msg.threadId == _id) {
-        messages.add(msg);
+        this._messages.add(msg);
       }
     }
     this.findContact();
@@ -407,14 +407,17 @@ class SmsQuery {
   /// Get all threads
   Future<Map<int, SmsThread>> get getAllThreads async {
     List<SmsMessage> messages = await this.getAllSms;
-    Map<int, SmsThread> map = {};
-    // TODO: change method for this, this should call findContact()
+    Map<int, List<SmsMessage>> filtered = {};
     messages.forEach((msg) {
-      if (!map.containsKey(msg.threadId)) {
-        map[msg.threadId] = new SmsThread(msg.threadId);
+      if (!filtered.containsKey(msg.threadId)) {
+        filtered[msg.threadId] = [];
       }
-      map[msg.threadId].addMessage(msg);
+      filtered[msg.threadId].add(msg);
     });
+    Map<int, SmsThread> map = {};
+    for (var k in filtered.keys) {
+      map[k] = new SmsThread.fromMessages(filtered[k]);
+    }
     return map;
   }
 }

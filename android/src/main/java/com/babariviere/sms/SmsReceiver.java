@@ -76,6 +76,7 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
             obj.put("date", msg.getTimestampMillis());
             obj.put("read", (msg.getStatusOnIcc() == SmsManager.STATUS_ON_ICC_READ) ? 1 : 0);
             obj.put("thread_id", TelephonyCompat.getOrCreateThreadId(context, msg.getOriginatingAddress()));
+
             events.success(obj);
           }
         } catch (Exception e) {
