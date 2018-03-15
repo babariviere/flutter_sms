@@ -1,7 +1,11 @@
-## [0.0.9] - 2018-03-10
+## [0.0.10] - WIP
 
 * SmsDelivery report
 * Automatically assign contact to created SmsThread
+
+## [0.0.9] - 2018-03-15
+
+* backward compatibility for Contact (pull request #1 by joanpablo)
 
 ## [0.0.8] - 2018-03-10
 
