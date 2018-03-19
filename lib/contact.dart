@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
+/// Class that represents the photo of a [Contact]
 class Photo {
   Uri _photoUri;
   Uri _thumbnailUri;
@@ -13,10 +14,16 @@ class Photo {
     this._thumbnailUri = thumbnailUri;
   }
 
+  /// Gets the full size photo Uri
   Uri get uri => this._photoUri;
 
+  /// Gets the thumbnail photo Uri
   Uri get thumbnailUri => this._thumbnailUri;
 
+  /// Get the bytes of the photo.
+  /// By default the returned bytes are the thumbnail representation
+  /// of the contact's photo. To retrieve the full size photo the
+  /// optional parameter [fullSize] must by set to 'true';
   Future<Uint8List> readBytes({bool fullSize = false}) async {
     if (fullSize) {
       return await _readFullSizeBytes();
@@ -45,6 +52,7 @@ class Photo {
   }
 }
 
+/// A contact's photo query
 class ContactPhotoQuery {
 
   static ContactPhotoQuery _instance;
@@ -62,6 +70,11 @@ class ContactPhotoQuery {
 
   ContactPhotoQuery._private(this._channel);
 
+  /// Get the bytes of the photo specified by [uri].
+  /// To get the full size of contact's photo the optional
+  /// parameter [fullSize] must be set to true. By default
+  /// the returned photo is the thumbnail representation of
+  /// the contact's photo.
   Future<Uint8List> queryContactPhoto(Uri uri, {bool fullSize = false}) async {
     return await _channel.invokeMethod(
         "getContactPhoto", {"photoUri": uri.path, "fullSize": fullSize});
