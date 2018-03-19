@@ -1,6 +1,85 @@
 import 'dart:async';
-
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
+
+/// Class that represents the photo of a [Contact]
+class Photo {
+  Uri _photoUri;
+  Uri _thumbnailUri;
+  Uint8List _bytes;
+  Uint8List _thumbnailBytes;
+
+  Photo(Uri photoUri, Uri thumbnailUri) {
+    this._photoUri = photoUri;
+    this._thumbnailUri = thumbnailUri;
+  }
+
+  /// Gets the full size photo Uri
+  Uri get uri => this._photoUri;
+
+  /// Gets the thumbnail photo Uri
+  Uri get thumbnailUri => this._thumbnailUri;
+
+  /// Get the bytes of the photo.
+  /// By default the returned bytes are the thumbnail representation
+  /// of the contact's photo. To retrieve the full size photo the
+  /// optional parameter [fullSize] must by set to 'true';
+  Future<Uint8List> readBytes({bool fullSize = false}) async {
+    if (fullSize) {
+      return await _readFullSizeBytes();
+    }
+    else {
+      return await _readThumbnailBytes();
+    }
+  }
+
+  Future<Uint8List> _readThumbnailBytes() async {
+    if (this._thumbnailUri != null && this._thumbnailBytes == null) {
+      var photoQuery = new ContactPhotoQuery();
+      this._thumbnailBytes =
+      await photoQuery.queryContactPhoto(this._thumbnailUri);
+    }
+    return _thumbnailBytes;
+  }
+
+  Future<Uint8List> _readFullSizeBytes() async {
+    if (this._photoUri != null && this._bytes == null) {
+      var photoQuery = new ContactPhotoQuery();
+      this._bytes =
+      await photoQuery.queryContactPhoto(this._photoUri, fullSize: true);
+    }
+    return _bytes;
+  }
+}
+
+/// A contact's photo query
+class ContactPhotoQuery {
+
+  static ContactPhotoQuery _instance;
+  final MethodChannel _channel;
+
+  factory ContactPhotoQuery() {
+    if (_instance == null) {
+      final MethodChannel methodChannel = const MethodChannel(
+          "plugins.babariviere.com/queryContactPhoto",
+          const StandardMethodCodec());
+      _instance = new ContactPhotoQuery._private(methodChannel);
+    }
+    return _instance;
+  }
+
+  ContactPhotoQuery._private(this._channel);
+
+  /// Get the bytes of the photo specified by [uri].
+  /// To get the full size of contact's photo the optional
+  /// parameter [fullSize] must be set to true. By default
+  /// the returned photo is the thumbnail representation of
+  /// the contact's photo.
+  Future<Uint8List> queryContactPhoto(Uri uri, {bool fullSize = false}) async {
+    return await _channel.invokeMethod(
+        "getContactPhoto", {"photoUri": uri.path, "fullSize": fullSize});
+  }
+}
 
 /// A contact of yours
 class Contact {
@@ -8,10 +87,10 @@ class Contact {
   String _firstName;
   String _lastName;
   String _address;
-  Uri _photoUri;
+  Photo _photo;
 
   Contact(String address,
-      {String firstName, String lastName, String fullName, Uri photo}) {
+      {String firstName, String lastName, String fullName, Photo photo}) {
     this._address = address;
     this._firstName = firstName;
     this._lastName = lastName;
@@ -20,7 +99,7 @@ class Contact {
     } else {
       this._fullName = fullName;
     }
-    this._photoUri = photo;
+    this._photo = photo;
   }
 
   Contact.fromJson(String address, Map data) {
@@ -35,8 +114,9 @@ class Contact {
     if (data.containsKey("name")) {
       this._fullName = data["name"];
     }
-    if (data.containsKey("photo")) {
-      this._photoUri = Uri.parse(data["photo"]);
+    if (data.containsKey("photo") && data.containsKey("thumbnail")) {
+      this._photo =
+      new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
   }
 
@@ -48,7 +128,7 @@ class Contact {
 
   String get address => this._address;
 
-  Uri get photo => this._photoUri;
+  Photo get photo => this._photo;
 }
 
 /// Called when sending SMS failed
@@ -87,12 +167,12 @@ class ContactQuery {
     }
     inProgress[address] = true;
     return await _channel.invokeMethod("getContact", {"address": address}).then(
-        (dynamic val) {
-      Contact contact = new Contact.fromJson(address, val);
-      queried[address] = contact;
-      inProgress[address] = false;
-      return contact;
-    }, onError: (Object e) {
+            (dynamic val) {
+          Contact contact = new Contact.fromJson(address, val);
+          queried[address] = contact;
+          inProgress[address] = false;
+          return contact;
+        }, onError: (Object e) {
       if (onError != null) {
         onError(e);
       }
