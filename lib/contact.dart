@@ -39,7 +39,7 @@ class Photo {
     if (this._photoUri != null && this._bytes == null) {
       var photoQuery = new ContactPhotoQuery();
       this._bytes =
-      await photoQuery.queryContactPhoto(this._photoUri, {fullSize: true});
+      await photoQuery.queryContactPhoto(this._photoUri, fullSize: true);
     }
     return _bytes;
   }
