@@ -2,6 +2,7 @@ package com.babariviere.sms;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
+import io.flutter.plugin.common.StandardMethodCodec;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
@@ -13,6 +14,7 @@ public class SmsPlugin {
   private static final String CHANNEL_SEND = "plugins.babariviere.com/sendSMS";
   private static final String CHANNEL_QUER = "plugins.babariviere.com/querySMS";
   private static final String CHANNEL_QUER_CONT = "plugins.babariviere.com/queryContact";
+  private static final String CHANNEL_QUER_CONT_PHOTO = "plugins.babariviere.com/queryContactPhoto";
 
   /**
    * Plugin registration.
@@ -39,5 +41,10 @@ public class SmsPlugin {
     final ContactQuery contactQuery = new ContactQuery(registrar);
     final MethodChannel queryContactChannel = new MethodChannel(registrar.messenger(), CHANNEL_QUER_CONT, JSONMethodCodec.INSTANCE);
     queryContactChannel.setMethodCallHandler(contactQuery);
+
+    /// Contact Photo query
+    final ContactPhotoQuery contactPhotoQuery = new ContactPhotoQuery(registrar);
+    final MethodChannel queryContactPhotoChannel = new MethodChannel(registrar.messenger(), CHANNEL_QUER_CONT_PHOTO, StandardMethodCodec.INSTANCE);
+    queryContactPhotoChannel.setMethodCallHandler(contactPhotoQuery);
   }
 }
