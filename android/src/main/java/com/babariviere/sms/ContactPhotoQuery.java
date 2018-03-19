@@ -21,7 +21,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
 
 /**
- * Created by babariviere on 10/03/18.
+ * Created by joanpablo on 18/03/18.
  */
 
 class ContactPhotoQuery implements MethodCallHandler, RequestPermissionsResultListener {
