@@ -59,7 +59,8 @@ class ContactQuery implements MethodCallHandler, RequestPermissionsResultListene
 
     String[] projection = new String[]{
             ContactsContract.PhoneLookup.DISPLAY_NAME,
-            ContactsContract.PhoneLookup.PHOTO_URI};
+            ContactsContract.PhoneLookup.PHOTO_URI,
+            ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI};
 
     JSONObject obj = new JSONObject();
     Cursor cursor = registrar.context().getContentResolver().query(uri, projection, null, null, null);
@@ -68,6 +69,7 @@ class ContactQuery implements MethodCallHandler, RequestPermissionsResultListene
         try {
           obj.put("name", cursor.getString(0));
           obj.put("photo", cursor.getString(1));
+          obj.put("thumbnail", cursor.getString(2));
         } catch (JSONException e) {
           e.printStackTrace();
         }

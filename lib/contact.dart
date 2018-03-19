@@ -4,18 +4,42 @@ import 'package:flutter/services.dart';
 
 class Photo {
   Uri _photoUri;
+  Uri _thumbnailUri;
   Uint8List _bytes;
+  Uint8List _thumbnailBytes;
 
-  Photo(Uri photoUri) {
+  Photo(Uri photoUri, Uri thumbnailUri) {
     this._photoUri = photoUri;
+    this._thumbnailUri = thumbnailUri;
   }
 
   Uri get uri => this._photoUri;
 
-  Future<Uint8List> readBytes() async {
+  Uri get thumbnailUri => this._thumbnailUri;
+
+  Future<Uint8List> readBytes({bool fullSize = false}) async {
+    if (fullSize) {
+      return await _readFullSizeBytes();
+    }
+    else {
+      return await _readThumbnailBytes();
+    }
+  }
+
+  Future<Uint8List> _readThumbnailBytes() async {
+    if (this._thumbnailUri != null && this._thumbnailBytes == null) {
+      var photoQuery = new ContactPhotoQuery();
+      this._thumbnailBytes =
+      await photoQuery.queryContactPhoto(this._thumbnailUri);
+    }
+    return _thumbnailBytes;
+  }
+
+  Future<Uint8List> _readFullSizeBytes() async {
     if (this._photoUri != null && this._bytes == null) {
       var photoQuery = new ContactPhotoQuery();
-      this._bytes = await photoQuery.queryContactPhoto(this._photoUri);
+      this._bytes =
+      await photoQuery.queryContactPhoto(this._photoUri, {fullSize: true});
     }
     return _bytes;
   }
@@ -29,7 +53,8 @@ class ContactPhotoQuery {
   factory ContactPhotoQuery() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
-          "plugins.babariviere.com/queryContactPhoto", const StandardMethodCodec());
+          "plugins.babariviere.com/queryContactPhoto",
+          const StandardMethodCodec());
       _instance = new ContactPhotoQuery._private(methodChannel);
     }
     return _instance;
@@ -37,9 +62,9 @@ class ContactPhotoQuery {
 
   ContactPhotoQuery._private(this._channel);
 
-  Future<Uint8List> queryContactPhoto(Uri photoUri) async {
+  Future<Uint8List> queryContactPhoto(Uri uri, {bool fullSize = false}) async {
     return await _channel.invokeMethod(
-        "getContactPhoto", {"photoUri": photoUri.path});
+        "getContactPhoto", {"photoUri": uri.path, "fullSize": fullSize});
   }
 }
 
@@ -76,8 +101,9 @@ class Contact {
     if (data.containsKey("name")) {
       this._fullName = data["name"];
     }
-    if (data.containsKey("photo")) {
-      this._photo = new Photo(Uri.parse(data["photo"]));
+    if (data.containsKey("photo") && data.containsKey("thumbnail")) {
+      this._photo =
+      new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
   }
 

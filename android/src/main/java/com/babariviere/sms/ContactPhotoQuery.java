@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
@@ -48,9 +49,31 @@ class ContactPhotoQuery implements MethodCallHandler, RequestPermissionsResultLi
         }
 
         photoUri = call.argument("photoUri");
+        boolean fullSize = call.hasArgument("fullSize") && (boolean) call.argument("fullSize");
         this.result = result;
         if (permissions.checkAndRequestPermission(permissionsList, Permissions.READ_CONTACT_ID_REQ)) {
-            queryContactPhoto();
+            if (fullSize) {
+                queryContactPhoto();
+            } else {
+                queryContactThumbnail();
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
+    private void queryContactThumbnail() {
+        Uri uri = Uri.withAppendedPath(ContactsContract.AUTHORITY_URI, photoUri);
+        Cursor cursor = registrar.context().getContentResolver().query(uri,
+                new String[]{ContactsContract.CommonDataKinds.Photo.PHOTO}, null, null, null);
+        if (cursor == null) {
+            return;
+        }
+        try {
+            if (cursor.moveToFirst()) {
+                result.success(cursor.getBlob(0));
+            }
+        } finally {
+            cursor.close();
         }
     }
 
