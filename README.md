@@ -24,6 +24,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 - [ ] MMS Query
 - [ ] Multi Sim Card
 - [x] Contact
+-   [x] Contact Photo (full size, thumbnail)
 
 ## Contributions
 
