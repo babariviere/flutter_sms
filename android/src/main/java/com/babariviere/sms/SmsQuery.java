@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -96,7 +97,11 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
       try {
         if (cursor.getColumnName(idx).equals("address") || cursor.getColumnName(idx).equals("body")) {
           res.put(cursor.getColumnName(idx), cursor.getString(idx));
-        } else {
+        }
+        else if (cursor.getColumnName(idx).equals("date") || cursor.getColumnName(idx).equals("date_sent")) {
+          res.put(cursor.getColumnName(idx), cursor.getLong(idx));
+        }
+        else {
           res.put(cursor.getColumnName(idx), cursor.getInt(idx));
         }
       } catch (JSONException e) {
