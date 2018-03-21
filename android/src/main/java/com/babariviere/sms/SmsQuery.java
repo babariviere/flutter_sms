@@ -50,6 +50,7 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
   private int start = 0;
   private int count = -1;
   private int threadId = -1;
+  private String address = null;
 
   SmsQuery(PluginRegistry.Registrar registrar) {
     this.registrar = registrar;
@@ -63,6 +64,7 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
     start = 0;
     count = -1;
     threadId = -1;
+    address = null;
     switch (call.method) {
       case "getInbox":
         request = SmsQueryRequest.Inbox;
@@ -85,6 +87,9 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
     }
     if (call.hasArgument("thread_id")) {
       threadId = call.argument("thread_id");
+    }
+    if (call.hasArgument("address")) {
+      address = call.argument("address");
     }
     if (permissions.checkAndRequestPermission(permissionsList, Permissions.READ_SMS_ID_REQ)) {
       querySms();
@@ -127,6 +132,9 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
       JSONObject obj = readSms(cursor);
       try {
         if (threadId >= 0 && obj.getInt("thread_id") != threadId) {
+          continue;
+        }
+        if (address != null && !obj.getString("address").equals(address)) {
           continue;
         }
       } catch (JSONException e) {
