@@ -321,6 +321,7 @@ class SmsQuery {
   Future<List<SmsMessage>> _querySmsWrapper(
       {int start,
       int count,
+      String address,
       int threadId,
       SmsQueryKind kind: SmsQueryKind.Inbox,
       SmsHandlerFail onError}) async {
@@ -330,6 +331,9 @@ class SmsQuery {
     }
     if (count != null && count > 0) {
       arguments["count"] = count;
+    }
+    if (address != null && address.isNotEmpty) {
+      arguments["address"] = address;
     }
     if (threadId != null && threadId >= 0) {
       arguments["thread_id"] = threadId;
@@ -365,6 +369,7 @@ class SmsQuery {
   Future<List<SmsMessage>> querySms(
       {int start,
       int count,
+      String address,
       int threadId,
       List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
       SmsHandlerFail onError,
@@ -375,6 +380,7 @@ class SmsQuery {
         ..addAll(await this._querySmsWrapper(
             start: start,
             count: count,
+            address: address,
             threadId: threadId,
             kind: kind,
             onError: onError));
