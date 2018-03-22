@@ -152,18 +152,15 @@ class ContactQuery {
 
   ContactQuery._private(this._channel);
 
-  Future<Contact> queryContact(String address,
-      {ContactHandlerFail onError}) async {
+  Future<Contact> queryContact(String address) async {
     if (address == null) {
-      onError("address is null");
-      return null;
+      throw("address is null");
     }
     if (queried.containsKey(address) && queried[address] != null) {
       return queried[address];
     }
     if (inProgress.containsKey(address) && inProgress[address] == true) {
-      onError("already requested");
-      return null;
+      throw("already requested");
     }
     inProgress[address] = true;
     return await _channel.invokeMethod("getContact", {"address": address}).then(
@@ -172,10 +169,6 @@ class ContactQuery {
           queried[address] = contact;
           inProgress[address] = false;
           return contact;
-        }, onError: (Object e) {
-      if (onError != null) {
-        onError(e);
-      }
-    });
+        });
   }
 }

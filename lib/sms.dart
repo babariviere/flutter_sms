@@ -177,8 +177,7 @@ class SmsThread {
   /// Set contact through contact query
   void findContact() async {
     ContactQuery query = new ContactQuery();
-    Contact contact = await query.queryContact(this._address,
-        onError: (Object e) => print(e.toString()));
+    Contact contact = await query.queryContact(this._address);
     if (contact != null) {
       this._contact = contact;
     }
@@ -245,12 +244,6 @@ class SmsReceiver {
   }
 }
 
-/// Called when SMS is sent (don't check if it's delivered
-typedef void SmsHandlerSucc();
-
-/// Called when sending SMS failed
-typedef void SmsHandlerFail(Object e);
-
 /// A SMS sender
 class SmsSender {
   static SmsSender _instance;
@@ -272,29 +265,19 @@ class SmsSender {
   /// Take a message in argument + 2 functions that will be called on success or on error
   ///
   /// This function will not set automatically thread id, you have to do it
-  Future<Null> sendSms(SmsMessage msg,
-      {SmsHandlerSucc onSuccess, SmsHandlerFail onError}) async {
+  Future<Null> sendSms(SmsMessage msg) async {
     if (msg == null || msg.address == null || msg.body == null) {
-      if (onError != null) {
-        if (msg == null) {
-          onError("no given message");
-        } else if (msg.address == null) {
-          onError("no given address");
-        } else if (msg.body == null) {
-          onError("no given body");
-        }
+      if (msg == null) {
+        throw("no given message");
+      } else if (msg.address == null) {
+        throw("no given address");
+      } else if (msg.body == null) {
+        throw("no given body");
       }
       return;
     }
     await _channel.invokeMethod("sendSMS", msg.toMap).then((dynamic val) {
       msg.date = new DateTime.now();
-      if (onSuccess != null) {
-        onSuccess();
-      }
-    }, onError: (dynamic e) {
-      if (onError != null) {
-        onError(e);
-      }
     });
   }
 }
@@ -323,8 +306,7 @@ class SmsQuery {
       int count,
       String address,
       int threadId,
-      SmsQueryKind kind: SmsQueryKind.Inbox,
-      SmsHandlerFail onError}) async {
+      SmsQueryKind kind: SmsQueryKind.Inbox}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
       arguments["start"] = start;
@@ -358,10 +340,6 @@ class SmsQuery {
         list.add(msg);
       }
       return list;
-    }, onError: (Object e) {
-      if (onError != null) {
-        onError(e);
-      }
     });
   }
 
@@ -372,7 +350,6 @@ class SmsQuery {
       String address,
       int threadId,
       List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
-      SmsHandlerFail onError,
       bool sort: true}) async {
     List<SmsMessage> result = [];
     for (var kind in kinds) {
@@ -382,8 +359,7 @@ class SmsQuery {
             count: count,
             address: address,
             threadId: threadId,
-            kind: kind,
-            onError: onError));
+            kind: kind,));
     }
     if (sort == true) {
       result.sort((a, b) => a.compareTo(b));
@@ -393,13 +369,12 @@ class SmsQuery {
 
   /// Query multiple thread by id
   Future<Map<int, SmsThread>> queryThreads(List<int> threadsId,
-      {List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
-      SmsHandlerFail onError}) async {
+      {List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox]}) async {
     Map<int, SmsThread> map = {};
     for (var id in threadsId) {
       map[id] = new SmsThread(id);
       map[id].messages =
-          await this.querySms(threadId: id, kinds: kinds, onError: onError);
+          await this.querySms(threadId: id, kinds: kinds);
     }
     return map;
   }
