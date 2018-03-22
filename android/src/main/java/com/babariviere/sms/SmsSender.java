@@ -18,37 +18,23 @@ import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultLi
  */
 
 @TargetApi(Build.VERSION_CODES.DONUT)
-class SmsSender implements MethodCallHandler, RequestPermissionsResultListener {
+class SmsSenderMethodHandler implements RequestPermissionsResultListener {
   private static final SmsManager sms = SmsManager.getDefault();
-  private final Permissions permissions;
   private final String[] permissionsList = new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE};
   private MethodChannel.Result result;
   private String address;
   private String body;
 
-  SmsSender(Registrar registrar) {
-    permissions = new Permissions(registrar.activity());
-    registrar.addRequestPermissionsResultListener(this);
+  SmsSenderMethodHandler(MethodChannel.Result result, String address, String body) {
+    this.result = result;
+    this.address = address;
+    this.body = body;
   }
 
-  @Override
-  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
-    this.result = result;
-    if (call.method.equals("sendSMS")) {
-      address = call.argument("address");
-      body = call.argument("body");
-      if (address == null) {
-        result.error("#02", "missing argument 'address'", null);
-      } else if (body == null) {
-        result.error("#02", "missing argument 'body'", null);
-      } else {
-        if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
-          sms.sendTextMessage(address, null, body, null, null);
-          result.success(null);
-        }
-      }
-    } else {
-      result.notImplemented();
+  void handle(Permissions permissions) {
+    if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
+      sms.sendTextMessage(address, null, body, null, null);
+      result.success(null);
     }
   }
 
@@ -58,7 +44,7 @@ class SmsSender implements MethodCallHandler, RequestPermissionsResultListener {
       return false;
     }
     boolean isOk = true;
-    for (int res: grantResults) {
+    for (int res : grantResults) {
       if (res != PackageManager.PERMISSION_GRANTED) {
         isOk = false;
         break;
@@ -71,5 +57,35 @@ class SmsSender implements MethodCallHandler, RequestPermissionsResultListener {
     }
     result.error("#01", "permission denied", null);
     return false;
+  }
+}
+
+@TargetApi(Build.VERSION_CODES.DONUT)
+class SmsSender implements MethodCallHandler {
+  private final Registrar registrar;
+  private final Permissions permissions;
+
+  SmsSender(Registrar registrar) {
+    this.registrar = registrar;
+    permissions = new Permissions(registrar.activity());
+  }
+
+  @Override
+  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+    if (call.method.equals("sendSMS")) {
+      String address = call.argument("address");
+      String body = call.argument("body");
+      if (address == null) {
+        result.error("#02", "missing argument 'address'", null);
+      } else if (body == null) {
+        result.error("#02", "missing argument 'body'", null);
+      } else {
+        SmsSenderMethodHandler handler = new SmsSenderMethodHandler(result, address, body);
+        this.registrar.addRequestPermissionsResultListener(handler);
+        handler.handle(this.permissions);
+      }
+    } else {
+      result.notImplemented();
+    }
   }
 }
