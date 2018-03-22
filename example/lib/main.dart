@@ -24,8 +24,7 @@ class _MyAppState extends State<MyApp> {
     List<SmsMessage> msgs = await query.querySms(
         start: 0,
         count: 2,
-        kinds: [SmsQueryKind.Sent],
-        onError: (Object e) => print(e.toString()));
+        kinds: [SmsQueryKind.Sent]);
     for (var msg in msgs) {
       setState(() {
         smsList += msg.threadId.toString() +
@@ -43,36 +42,6 @@ class _MyAppState extends State<MyApp> {
         }
       });
     }
-//    query.getAllSms.then((List<SmsMessage> msgs) {
-//      int count = 0;
-//      msgs.forEach((msg) {
-//          print(msg.id.toString() + ": " + msg.kind.toString() + " => " +
-//              msg.body + "\n");
-//        count++;
-//      });
-//      print("Total: " + count.toString());
-//    });
-//    query.queryThreads([47]).then((Map val) {
-//      val.forEach((dynamic k, dynamic v) {
-//        int key = k as int;
-//        SmsThread val = v as SmsThread;
-//        print(key.toString() + ":\n");
-//        for (var msg in val.messages) {
-//          print(msg.body);
-//        }
-//      });
-//    });
-//    query.getAllThreads.then((Map val) {
-//      val.keys.forEach((dynamic k) {
-//        print(k.toString());
-//      });
-//      val.values.forEach((dynamic v) {
-//        SmsThread t = v;
-//        t.messages.forEach((m) {
-//          print(m.address + ": " + m.body);
-//        });
-//      });
-//    });
   }
 
   @override
@@ -89,9 +58,6 @@ class _MyAppState extends State<MyApp> {
             "\nbody: " +
             lastMessage.body;
       });
-    }, onError: (Object err) {
-      print(err);
-      setState(() => text = err.toString());
     });
     _smsSubscription
         .onDone(() => setState(() => text = "Stream in now closed"));
@@ -129,7 +95,7 @@ class _MyAppState extends State<MyApp> {
                       var text = _controller.text;
                       _controller.clear();
                       SmsMessage msg = new SmsMessage(lastMessage.sender, text);
-                      sender.sendSms(msg, onError: (Object e) => print(e));
+                      sender.sendSms(msg).catchError((Object e) => print(e.toString()));
                     },
                     child: new Text("REPLY"),
                   )
