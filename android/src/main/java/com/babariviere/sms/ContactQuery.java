@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.provider.ContactsContract;
 
 import org.json.JSONException;
@@ -23,31 +22,19 @@ import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultLi
  * Created by babariviere on 10/03/18.
  */
 
-class ContactQuery implements MethodCallHandler, RequestPermissionsResultListener {
+class ContactQueryHandler implements RequestPermissionsResultListener {
   private final String[] permissionsList = new String[]{Manifest.permission.READ_CONTACTS};
-  private final Permissions permissions;
-  private final PluginRegistry.Registrar registrar;
+  private PluginRegistry.Registrar registrar;
   private MethodChannel.Result result;
   private String contactAddress;
 
-  ContactQuery(PluginRegistry.Registrar registrar) {
+  ContactQueryHandler(PluginRegistry.Registrar registrar, MethodChannel.Result result, String contactAddress) {
     this.registrar = registrar;
-    permissions = new Permissions(registrar.activity());
-    registrar.addRequestPermissionsResultListener(this);
+    this.result = result;
+    this.contactAddress = contactAddress;
   }
 
-  @Override
-  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
-    if (!call.method.equals("getContact")) {
-      result.notImplemented();
-      return;
-    }
-    if (!call.hasArgument("address")) {
-      result.error("#02", "missing argument 'address'", null);
-      return;
-    }
-    contactAddress = call.argument("address");
-    this.result = result;
+  void handle(Permissions permissions) {
     if (permissions.checkAndRequestPermission(permissionsList, Permissions.READ_CONTACT_ID_REQ)) {
       queryContact();
     }
@@ -58,10 +45,9 @@ class ContactQuery implements MethodCallHandler, RequestPermissionsResultListene
     Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(this.contactAddress));
 
     String[] projection = new String[]{
-            ContactsContract.PhoneLookup.DISPLAY_NAME,
-            ContactsContract.PhoneLookup.PHOTO_URI,
-            ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI};
-
+        ContactsContract.PhoneLookup.DISPLAY_NAME,
+        ContactsContract.PhoneLookup.PHOTO_URI,
+        ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI};
     JSONObject obj = new JSONObject();
     Cursor cursor = registrar.context().getContentResolver().query(uri, projection, null, null, null);
     if (cursor != null) {
@@ -98,4 +84,32 @@ class ContactQuery implements MethodCallHandler, RequestPermissionsResultListene
     result.error("#01", "permission denied", null);
     return false;
   }
+}
+
+class ContactQuery implements MethodCallHandler {
+  private final Permissions permissions;
+  private final PluginRegistry.Registrar registrar;
+
+  ContactQuery(PluginRegistry.Registrar registrar) {
+    this.registrar = registrar;
+    permissions = new Permissions(registrar.activity());
+  }
+
+  @Override
+  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+    if (!call.method.equals("getContact")) {
+      result.notImplemented();
+      return;
+    }
+    if (!call.hasArgument("address")) {
+      result.error("#02", "missing argument 'address'", null);
+      return;
+    }
+    String contactAddress = call.argument("address");
+    ContactQueryHandler handler = new ContactQueryHandler(registrar, result, contactAddress);
+    this.registrar.addRequestPermissionsResultListener(handler);
+    handler.handle(permissions);
+  }
+
+
 }
