@@ -151,7 +151,6 @@ class SmsThread {
         this._messages.add(msg);
       }
     }
-    this.findContact();
   }
 
   /// Add a message at the end
@@ -175,7 +174,7 @@ class SmsThread {
   }
 
   /// Set contact through contact query
-  void findContact() async {
+  Future findContact() async {
     ContactQuery query = new ContactQuery();
     Contact contact = await query.queryContact(this._address);
     if (contact != null) {
@@ -398,6 +397,7 @@ class SmsQuery {
     Map<int, SmsThread> map = {};
     for (var k in filtered.keys) {
       map[k] = new SmsThread.fromMessages(filtered[k]);
+      await map[k].findContact();
     }
     return map;
   }
