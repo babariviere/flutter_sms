@@ -367,15 +367,16 @@ class SmsQuery {
   }
 
   /// Query multiple thread by id
-  Future<Map<int, SmsThread>> queryThreads(List<int> threadsId,
+  Future<List<SmsThread>> queryThreads(List<int> threadsId,
       {List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox]}) async {
-    Map<int, SmsThread> map = {};
+    List<SmsThread> threads = <SmsThread>[];
     for (var id in threadsId) {
-      map[id] = new SmsThread(id);
-      map[id].messages =
-          await this.querySms(threadId: id, kinds: kinds);
+      final thread = new SmsThread(id);
+      thread.messages = await this.querySms(threadId: id, kinds: kinds);
+      await thread.findContact();
+      threads.add(thread);
     }
-    return map;
+    return threads;
   }
 
   /// Get all SMS
@@ -385,7 +386,7 @@ class SmsQuery {
   }
 
   /// Get all threads
-  Future<Map<int, SmsThread>> get getAllThreads async {
+  Future<List<SmsThread>> get getAllThreads async {
     List<SmsMessage> messages = await this.getAllSms;
     Map<int, List<SmsMessage>> filtered = {};
     messages.forEach((msg) {
@@ -394,11 +395,12 @@ class SmsQuery {
       }
       filtered[msg.threadId].add(msg);
     });
-    Map<int, SmsThread> map = {};
+    List<SmsThread> threads = <SmsThread>[];
     for (var k in filtered.keys) {
-      map[k] = new SmsThread.fromMessages(filtered[k]);
-      await map[k].findContact();
+      final thread = new SmsThread.fromMessages(filtered[k]);
+      await thread.findContact();
+      threads.add(thread);
     }
-    return map;
+    return threads;
   }
 }

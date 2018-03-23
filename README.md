@@ -11,6 +11,137 @@ For help getting started with Flutter, view our online
 
 For help on editing plugin code, view the [documentation](https://flutter.io/platform-plugins/#edit-code).
 
+## Installation and Usage
+
+Once you're familiar with Flutter you may install this package adding `sms` (0.1.0 or higher) to the dependencies list
+of the `pubspec.yaml` file as follow:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+    
+  sms: ^0.1.0
+```
+
+Then run the command `flutter packages get` on the console.
+
+## Querying SMS messages
+
+Add the import statement for `sms` and create an instance of the *SmsQuery* class:
+
+```dart
+import 'package:sms/sms.dart';
+
+void main() {
+  SmsQuery query = new SmsQuery();
+}
+
+``` 
+
+####Getting all SMS messages:
+
+```dart
+List<SmsMessage> messages = await query.getAllSms;
+``` 
+**Note**: _the use of `await` keyword means that `getAllSms` is resolved asynchronously
+and a Future is retorned._
+
+####Filtering SMS messages:
+
+The method `querySms` from the `SmsQuery` class returns a list of sms depending of the supplied parameters. For example,
+for querying all the sms messages sent and received write the followed code:
+
+```dart
+await query.querySms({
+    kinds: [SmsQueryKind.Inbox, SmsQueryKind.Sent]
+});
+```
+
+You can also query all the sms messages sent and received from a specific contact:
+
+```
+await query.querySms({
+    address: getContactAddress()
+});
+```
+
+####Getting all Threads Conversations:
+
+With `SmsQuery` you can also get the entire list of conversations:
+
+```dart
+List<SmsThread> threads = await query.getAllThreads;
+```
+
+##Getting the Contact info:
+
+Each conversation thread is related with a Contact. 
+The class `Contact` contains all the info of a thread contact (address, photo, full name).
+To get access to `Contact` class you must import `'package:sms/contact.dart'` into your dart file:
+```dart
+import 'package:sms/contact.dart';
+
+void main() {
+  ...
+  Contact contact = threads.first.contact;
+  print(contact.address);
+}
+```
+
+####Querying Contact:
+You can also query a contact by its address _(phone number)_:
+
+```dart
+import 'package:sms/contact.dart';
+
+void main() {
+  ContactQuery contacts = new ContactQuery();
+  Contact contact = contacts.queryContact(getAddress());
+  print(contact.fullName);
+}
+String getAddress() {...}
+```
+
+####The Contact photo:
+You can retrieve the photo of the contact (full size or thumbnail):
+
+```dart
+...
+Photo photo = contact.photo;
+Uint8List thumbnail = await photo.readBytes();
+Uint8List fullSize = await photo.readBytes(fullSize: true);
+```
+**Note**: _the use of `await` keyword means that `readBytes()` is resolved asynchronously
+and a Future is retorned._
+
+##Sending SMS:
+
+What about sending a SMS? All you have to do is to create an instance of the `SmsSender` class:
+
+```dart
+import 'package:sms/sms.dart';
+
+void main() {
+  SmsSender sender = new SmsSender();
+  String address = getAddress();
+  ...
+  sender.sendSms(new SmsMessage(address, 'Hello flutter!'));
+}
+```
+
+##Receiving SMS:
+If you want to be notified for incoming new messages you must subscribe to an instance of the `SmsReceiver` class:
+
+```dart
+import 'package:sms/sms.dart';
+
+void main() {
+  SmsReceiver receiver = new SmsReceiver();
+  receiver.onSmsReceived.listen((SmsMessage msg) => print(msg.body));
+}
+```
+
 ## Roadmap
 
 - [x] SMS Receiver
