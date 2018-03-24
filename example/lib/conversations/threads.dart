@@ -52,14 +52,23 @@ class _ThreadsState extends State<Threads> {
     return widgets;
   }
 
-  void _onSmsReceived(SmsMessage sms) {
-    setState((){
-      var thread = _threads.singleWhere((thread)=>thread.id == sms.threadId);
-      if (thread == null) {
-        thread = new SmsThread(sms.id);
-      }
-      thread.addNewMessage(sms);
-    });
+  void _onSmsReceived(SmsMessage sms) async {
+
+    var thread = _threads.singleWhere(
+            (thread){
+              return thread.id == sms.threadId;
+            },
+            orElse: (){
+              var thread = new SmsThread(sms.threadId);
+              _threads.add(thread);
+              return thread;
+            }
+    );
+
+    thread.addNewMessage(sms);
+    await thread.findContact();
+
+    setState((){});
   }
 
   void _onThreadsLoaded(List<SmsThread> threads) {
