@@ -12,7 +12,7 @@ class Messages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListView(
-      children: messages.map((message) => new Message(message)).toList(),
+      children: messages.reversed.map((message) => new Message(message)).toList(),
     );
   }
 }

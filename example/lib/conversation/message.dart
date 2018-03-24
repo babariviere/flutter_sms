@@ -7,7 +7,7 @@ class Message extends StatelessWidget {
 
   final SmsMessage message;
 
-  Message(this.message) : super();
+  Message(this.message) : super(key: new ObjectKey(message));
 
   bool get sent => message.kind == SmsMessageKind.Sent;
 
@@ -18,57 +18,59 @@ class Message extends StatelessWidget {
 
   Widget get _sentWidget {
     return new Container(
-      margin: new EdgeInsets.symmetric(
-          horizontal: 20.0,
-          vertical: 3.0
-      ),
       child: new Row(
         children: <Widget>[
-          new Expanded(child: new Text('')),
-          new Container(
-            child: new Text(message.body),
-            padding: new EdgeInsets.all(10.0),
-            margin: new EdgeInsets.symmetric(
-                horizontal: 10.0,
-                vertical: 3.0
-            ),
-            decoration: new BoxDecoration(
-                color: Colors.red
+          new Expanded(
+            child: new Container(
+              child: new Text(
+                  message.body,
+                  textAlign: TextAlign.left,
+              ),
+              margin: new EdgeInsets.only(left: 50.0),
+              padding: new EdgeInsets.all(10.0),
+              decoration: new BoxDecoration(
+                  color: Colors.yellow[100]
+              ),
             ),
           ),
-          new CircleAvatar(
-            child: new Text('C'),
-          )
+          new Container(
+            child: new CircleAvatar(
+              child: new Text('C'),
+            ),
+            margin: new EdgeInsets.only(left: 10.0),
+          ),
         ],
       ),
+      margin: new EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
     );
   }
 
   Widget get _receivedWidget {
     return new Container(
-      margin: new EdgeInsets.symmetric(
-          horizontal: 20.0,
-          vertical: 3.0
-      ),
       child: new Row(
         children: <Widget>[
-          new CircleAvatar(
-            child: new Text('C'),
-          ),
           new Container(
-            child: new Text(message.body),
-            padding: new EdgeInsets.all(10.0),
-            margin: new EdgeInsets.symmetric(
-                horizontal: 10.0,
-                vertical: 3.0
-            ),
-            decoration: new BoxDecoration(
-                color: Colors.pinkAccent
-            ),
+              child: new CircleAvatar(
+                  child: new Text('C'),
+              ),
+              margin: new EdgeInsets.only(right: 10.0),
           ),
-          new Expanded(child: new Text('')),
+          new Expanded(
+            child: new Container(
+              child: new Text(
+                  message.body,
+                  textAlign: TextAlign.left,
+              ),
+              margin: new EdgeInsets.only(right: 50.0),
+              padding: new EdgeInsets.all(10.0),
+              decoration: new BoxDecoration(
+                color: Colors.grey[300]
+              ),
+            ),
+          )
         ],
       ),
+      margin: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
     );
   }
 }

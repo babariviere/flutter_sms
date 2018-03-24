@@ -9,7 +9,7 @@ class Thread extends StatelessWidget {
 
   final SmsThread thread;
 
-  Thread(this.thread): super();
+  Thread(this.thread): super(key: new ObjectKey(thread));
 
   @override
   Widget build(BuildContext context) {
