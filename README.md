@@ -39,7 +39,7 @@ void main() {
 
 ``` 
 
-###Getting all SMS messages:
+##Getting all SMS messages:
 
 ```dart
 List<SmsMessage> messages = await query.getAllSms;
@@ -47,7 +47,7 @@ List<SmsMessage> messages = await query.getAllSms;
 **Note**: _the use of `await` keyword means that `getAllSms` is resolved asynchronously
 and a Future is retorned._
 
-###Filtering SMS messages:
+##Filtering SMS messages:
 
 The method `querySms` from the `SmsQuery` class returns a list of sms depending of the supplied parameters. For example,
 for querying all the sms messages sent and received write the followed code:
@@ -66,7 +66,7 @@ await query.querySms({
 });
 ```
 
-###Getting all Threads Conversations:
+##Getting all Threads Conversations:
 
 With `SmsQuery` you can also get the entire list of conversations:
 
@@ -89,7 +89,7 @@ void main() {
 }
 ```
 
-###Querying Contact:
+##Querying Contact:
 You can also query a contact by its address _(phone number)_:
 
 ```dart
@@ -103,7 +103,7 @@ void main() {
 String getAddress() {...}
 ```
 
-###The Contact photo:
+##The Contact photo:
 You can retrieve the photo of the contact (full size or thumbnail):
 
 ```dart
