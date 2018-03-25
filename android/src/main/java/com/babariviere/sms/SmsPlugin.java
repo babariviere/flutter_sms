@@ -2,9 +2,9 @@ package com.babariviere.sms;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
-import io.flutter.plugin.common.StandardMethodCodec;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.plugin.common.StandardMethodCodec;
 
 /**
  * SmsPlugin
@@ -27,9 +27,8 @@ public class SmsPlugin {
     recvSmsChannel.setStreamHandler(receiver);
 
     /// SMS sender
-    final SmsSender sender = new SmsSender(registrar);
-    final MethodChannel sendSmsChannel = new MethodChannel(registrar.messenger(),
-        CHANNEL_SEND, JSONMethodCodec.INSTANCE);
+    final MethodChannel sendSmsChannel = new MethodChannel(registrar.messenger(), CHANNEL_SEND);
+    final SmsSender sender = new SmsSender(registrar, sendSmsChannel);
     sendSmsChannel.setMethodCallHandler(sender);
 
     /// SMS query
