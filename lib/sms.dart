@@ -277,6 +277,7 @@ class SmsSender {
     }
     await _channel.invokeMethod("sendSMS", msg.toMap).then((dynamic val) {
       msg.date = new DateTime.now();
+      msg.kind = SmsMessageKind.Sent;
     });
   }
 }
