@@ -39,15 +39,32 @@ class _ThreadsState extends State<Threads> {
 
     if (_loading) {
       widgets.add(new LinearProgressIndicator());
+      widgets.add(
+          new Expanded(
+              child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Text('Loading conversations...'),
+                    new Icon(
+                        Icons.chat,
+                        color: Colors.grey[500],
+                        size: 40.0,
+                    ),
+                  ],
+              ),
+          ),
+      );
     }
-
-    widgets.add(
+    else {
+      widgets.add(
         new Expanded(
-            child: new ListView(
-              children: _threads.map((thread) => new Thread(thread)).toList(),
-            ),
+          child: new ListView(
+            children: _threads.map((thread) => new Thread(thread)).toList(),
+          ),
         ),
-    );
+      );
+    }
 
     return widgets;
   }

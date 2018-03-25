@@ -38,34 +38,49 @@ class _ConversationState extends State<Conversation> {
           new Expanded(
             child: new Messages(widget.thread.messages),
           ),
-          new Row(
-            children: <Widget>[
-              new Expanded(
-                  child: new Container(
-                      child: new TextField(controller: _controller),
+          new Material(
+              elevation: 4.0,
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new Container(
+                      child: new TextField(
+                        controller: _controller,
+                        decoration: new InputDecoration(
+                            border: InputBorder.none,
+                            labelStyle: new TextStyle(fontSize: 16.0),
+                            labelText: "Reply with:"
+                        ),
+                      ),
                       padding: new EdgeInsets.only(left: 20.0),
+                    ),
                   ),
+                  new IconButton(
+                    icon: new Icon(Icons.send),
+                    onPressed: _sendMessage,
+                    color: Colors.blue,
+                  )
+                ],
               ),
-              new IconButton(
-                  icon: new Icon(Icons.send),
-                  onPressed: _sendMessage,
-                  color: Colors.blue,
-              )
-            ],
-          )
+          ),
+
         ],
       )
     );
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
+
+    final message = new SmsMessage(
+        widget.thread.address,
+        _controller.text,
+        threadId: widget.thread.id
+    );
+
+    _controller.clear();
+    await _sender.sendSms(message);
+
     setState((){
-      final message = new SmsMessage(
-          widget.thread.address,
-          _controller.text,
-          threadId: widget.thread.id
-      );
-      _sender.sendSms(message);
       widget.thread.addNewMessage(message);
     });
   }
