@@ -70,7 +70,6 @@ class _ThreadsState extends State<Threads> {
   }
 
   void _onSmsReceived(SmsMessage sms) async {
-
     var thread = _threads.singleWhere(
             (thread){
               return thread.id == sms.threadId;

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_example/conversation/formSend.dart';
 import 'package:sms_example/conversation/messages.dart';
 
 class Conversation extends StatefulWidget {
@@ -15,8 +16,6 @@ class Conversation extends StatefulWidget {
 
 class _ConversationState extends State<Conversation> {
 
-  final TextEditingController _controller = new TextEditingController();
-  final SmsSender _sender = new SmsSender();
   final SmsReceiver _receiver = new SmsReceiver();
 
   @override
@@ -31,55 +30,23 @@ class _ConversationState extends State<Conversation> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(widget.thread.contact.fullName != null ? widget.thread.contact.fullName : widget.thread.contact.address),
+        title: new Text(widget.thread.contact.fullName ?? widget.thread.contact.address),
       ),
       body: new Column(
         children: <Widget>[
           new Expanded(
-            child: new Messages(widget.thread.messages),
+              child: new Messages(widget.thread.messages),
           ),
-          new Material(
-              elevation: 4.0,
-              child: new Row(
-                children: <Widget>[
-                  new Expanded(
-                    child: new Container(
-                      child: new TextField(
-                        controller: _controller,
-                        decoration: new InputDecoration(
-                            border: InputBorder.none,
-                            labelStyle: new TextStyle(fontSize: 16.0),
-                            labelText: "Reply with:"
-                        ),
-                      ),
-                      padding: new EdgeInsets.only(left: 20.0),
-                    ),
-                  ),
-                  new IconButton(
-                    icon: new Icon(Icons.send),
-                    onPressed: _sendMessage,
-                    color: Colors.blue,
-                  )
-                ],
-              ),
+          new FormSend(
+              widget.thread,
+              onMessageSent: _onMessageSent,
           ),
-
         ],
       )
     );
   }
 
-  void _sendMessage() async {
-
-    final message = new SmsMessage(
-        widget.thread.address,
-        _controller.text,
-        threadId: widget.thread.id
-    );
-
-    _controller.clear();
-    await _sender.sendSms(message);
-
+  void _onMessageSent(SmsMessage message) {
     setState((){
       widget.thread.addNewMessage(message);
     });
