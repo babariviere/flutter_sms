@@ -15,7 +15,7 @@ class Thread extends StatelessWidget {
   Widget build(BuildContext context) {
     return new ListTile(
       leading: new Avatar(thread.contact),
-      title: new Text(thread.contact.fullName != null ? thread.contact.fullName : thread.contact.address),
+      title: new Text(thread.contact.fullName ?? thread.contact.address),
       subtitle: new Text(
           thread.messages.first.body,
           maxLines: 2,
