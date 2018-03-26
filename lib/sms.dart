@@ -24,12 +24,13 @@ class SmsMessage implements Comparable<SmsMessage> {
   SmsMessageKind _kind;
 
   SmsMessage(this._address, this._body,
-      {int id, int threadId, bool read, DateTime date, DateTime dateSent}) {
+      {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
     this._read = read;
     this._date = date;
     this._dateSent = dateSent;
+    this._kind = kind;
   }
 
   /// Read message fron JSON
@@ -264,7 +265,7 @@ class SmsSender {
   /// Take a message in argument + 2 functions that will be called on success or on error
   ///
   /// This function will not set automatically thread id, you have to do it
-  Future<Null> sendSms(SmsMessage msg) async {
+  Future<SmsMessage> sendSms(SmsMessage msg) async {
     if (msg == null || msg.address == null || msg.body == null) {
       if (msg == null) {
         throw("no given message");
@@ -273,11 +274,16 @@ class SmsSender {
       } else if (msg.body == null) {
         throw("no given body");
       }
-      return;
+      return null;
     }
-    await _channel.invokeMethod("sendSMS", msg.toMap).then((dynamic val) {
-      msg.date = new DateTime.now();
-    });
+    await _channel.invokeMethod("sendSMS", msg.toMap);
+    return new SmsMessage(
+        msg.address,
+        msg.body,
+        threadId: msg.threadId,
+        date: new DateTime.now(),
+        kind: SmsMessageKind.Sent
+    );
   }
 }
 
