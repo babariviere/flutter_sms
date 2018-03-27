@@ -13,18 +13,32 @@ class Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return sent ? _sentWidget : _receivedWidget;
+    return sent ? _buildSentWidget(context) : _buildReceivedWidget(context);
   }
 
-  Widget get _sentWidget {
+  Widget _buildSentWidget(BuildContext context) {
     return new Container(
       child: new Row(
         children: <Widget>[
           new Expanded(
             child: new Container(
-              child: new Text(
-                  message.body,
-                  textAlign: TextAlign.left,
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  new Text(message.body),
+                  new Align(
+                    child: new Padding(
+                        padding: new EdgeInsets.only(top: 5.0),
+                        child: new Text(
+                          _time.format(context),
+                          style: new TextStyle(
+                            color: Colors.grey[500]
+                          ),
+                        ),
+                    ),
+                    alignment: Alignment.centerRight,
+                  )
+                ],
               ),
               margin: new EdgeInsets.only(left: 50.0),
               padding: new EdgeInsets.all(10.0),
@@ -45,7 +59,7 @@ class Message extends StatelessWidget {
     );
   }
 
-  Widget get _receivedWidget {
+  Widget _buildReceivedWidget(BuildContext context) {
     return new Container(
       child: new Row(
         children: <Widget>[
@@ -57,9 +71,23 @@ class Message extends StatelessWidget {
           ),
           new Expanded(
             child: new Container(
-              child: new Text(
-                  message.body,
-                  textAlign: TextAlign.left,
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  new Text(message.body),
+                  new Align(
+                    child: new Padding(
+                      padding: new EdgeInsets.only(top: 5.0),
+                      child: new Text(
+                        _time.format(context),
+                        style: new TextStyle(
+                            color: Colors.grey
+                        ),
+                      ),
+                    ),
+                    alignment: Alignment.centerLeft,
+                  )
+                ],
               ),
               margin: new EdgeInsets.only(right: 50.0),
               padding: new EdgeInsets.all(10.0),
@@ -70,7 +98,12 @@ class Message extends StatelessWidget {
           )
         ],
       ),
-      margin: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+      margin: new EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
     );
+  }
+
+  get _time {
+
+    return new TimeOfDay(hour: message.date.hour, minute: message.date.minute);
   }
 }
