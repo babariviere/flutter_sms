@@ -20,16 +20,14 @@ class SmsMessage implements Comparable<SmsMessage> {
   String _body;
   bool _read;
   DateTime _date;
-  DateTime _dateSent;
   SmsMessageKind _kind;
 
   SmsMessage(this._address, this._body,
-      {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
+      {int id, int threadId, bool read, DateTime date, SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
     this._read = read;
     this._date = date;
-    this._dateSent = dateSent;
     this._kind = kind;
   }
 
@@ -55,12 +53,14 @@ class SmsMessage implements Comparable<SmsMessage> {
     if (data.containsKey("read")) {
       this._read = data["read"] as int == 1;
     }
-    if (data.containsKey("date")) {
-      this._date = new DateTime.fromMillisecondsSinceEpoch(data["date"]);
+    if (data.containsKey("kind")) {
+      this._kind = data["kind"];
     }
-    if (data.containsKey("date_sent")) {
-      this._dateSent =
-          new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+    if (_kind == SmsMessageKind.Received && data.containsKey("date_sent")) {
+      this._date = new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+    }
+    else if (_kind == SmsMessageKind.Sent && data.containsKey("date")) {
+      this._date = new DateTime.fromMillisecondsSinceEpoch(data["date"]);
     }
   }
 
@@ -85,9 +85,6 @@ class SmsMessage implements Comparable<SmsMessage> {
     if (_date != null) {
       res["date"] = _date.millisecondsSinceEpoch;
     }
-    if (_dateSent != null) {
-      res["date_sent"] = _dateSent.millisecondsSinceEpoch;
-    }
     return res;
   }
 
@@ -108,9 +105,6 @@ class SmsMessage implements Comparable<SmsMessage> {
 
   /// Check if message is read
   bool get isRead => this._read;
-
-  /// Get date sent
-  DateTime get dateSent => this._dateSent;
 
   /// Get date
   DateTime get date => this._date;
@@ -340,8 +334,8 @@ class SmsQuery {
     return await _channel.invokeMethod(function, arguments).then((dynamic val) {
       List<SmsMessage> list = [];
       for (Map data in val) {
+        data['kind'] = msgKind;
         SmsMessage msg = new SmsMessage.fromJson(data);
-        msg.kind = msgKind;
         list.add(msg);
       }
       return list;
