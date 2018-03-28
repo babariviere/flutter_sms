@@ -27,10 +27,10 @@ class FormSend extends StatelessWidget {
                 decoration: new InputDecoration(
                     border: InputBorder.none,
                     labelStyle: new TextStyle(fontSize: 16.0),
-                    labelText: "Reply with:"
+                    hintText: "Send message:"
                 ),
               ),
-              padding: new EdgeInsets.only(left: 20.0),
+              padding: new EdgeInsets.only(left: 20.0, top: 8.0, bottom: 8.0),
             ),
           ),
           new IconButton(
