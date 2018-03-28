@@ -15,6 +15,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.util.Date;
+
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
@@ -69,16 +71,21 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
           if (msgs == null) {
             return;
           }
-          for (SmsMessage msg: msgs) {
-            JSONObject obj = new JSONObject();
-            obj.put("address", msg.getOriginatingAddress());
-            obj.put("body", msg.getMessageBody());
-            obj.put("date", msg.getTimestampMillis());
-            obj.put("read", (msg.getStatusOnIcc() == SmsManager.STATUS_ON_ICC_READ) ? 1 : 0);
-            obj.put("thread_id", TelephonyCompat.getOrCreateThreadId(context, msg.getOriginatingAddress()));
 
-            events.success(obj);
+          JSONObject obj = new JSONObject();
+          obj.put("address", msgs[0].getOriginatingAddress());
+          obj.put("date", (new Date()).getTime());
+          obj.put("date_sent", msgs[0].getTimestampMillis());
+          obj.put("read", (msgs[0].getStatusOnIcc() == SmsManager.STATUS_ON_ICC_READ) ? 1 : 0);
+          obj.put("thread_id", TelephonyCompat.getOrCreateThreadId(context, msgs[0].getOriginatingAddress()));
+
+          String body = "";
+          for (SmsMessage msg: msgs) {
+            body = body.concat(msg.getMessageBody());
           }
+          obj.put("body", body);
+
+          events.success(obj);
         } catch (Exception e) {
           Log.d("SmsReceiver", e.toString());
         }
