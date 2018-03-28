@@ -14,9 +14,12 @@ class Messages extends StatelessWidget {
   Widget build(BuildContext context) {
     final groups = MessageGroupService.of(context).groupByDate(messages);
 
-    return new ListView(
-      children: groups.map((group) => new MessageGroup(group)).toList(),
-      reverse: true,
+    return new ListView.builder(
+        reverse: true,
+        itemCount: groups.length,
+        itemBuilder: (context, index) {
+          return new MessageGroup(groups[index]);
+        }
     );
   }
 }

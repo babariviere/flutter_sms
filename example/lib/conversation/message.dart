@@ -7,7 +7,7 @@ class Message extends StatelessWidget {
 
   final SmsMessage message;
 
-  Message(this.message) : super(key: new ObjectKey(message));
+  Message(this.message) : super();
 
   bool get sent => message.kind == SmsMessageKind.Sent;
 
@@ -25,7 +25,7 @@ class Message extends StatelessWidget {
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  new Text(message.body),
+                  new Text(message.body.trim()),
                   new Align(
                     child: new Padding(
                         padding: new EdgeInsets.only(top: 5.0),
@@ -74,7 +74,7 @@ class Message extends StatelessWidget {
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  new Text(message.body),
+                  new Text(message.body.trim()),
                   new Align(
                     child: new Padding(
                       padding: new EdgeInsets.only(top: 5.0),
