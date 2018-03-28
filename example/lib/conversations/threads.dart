@@ -59,8 +59,11 @@ class _ThreadsState extends State<Threads> {
     else {
       widgets.add(
         new Expanded(
-          child: new ListView(
-            children: _threads.map((thread) => new Thread(thread)).toList(),
+          child: new ListView.builder(
+              itemCount: _threads.length,
+              itemBuilder: (context, index) {
+                return new Thread(_threads[index]);
+              }
           ),
         ),
       );

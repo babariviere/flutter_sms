@@ -9,7 +9,7 @@ class Thread extends StatelessWidget {
 
   final SmsThread thread;
 
-  Thread(this.thread): super(key: new ObjectKey(thread));
+  Thread(this.thread): super();
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class Thread extends StatelessWidget {
       leading: new Avatar(thread.contact),
       title: new Text(thread.contact.fullName ?? thread.contact.address),
       subtitle: new Text(
-          thread.messages.first.body,
+          thread.messages.first.body.trim(),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
       ),
