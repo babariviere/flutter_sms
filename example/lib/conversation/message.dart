@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/sms.dart';
-
+import 'package:sms_example/utils/colors.dart';
 
 class Message extends StatelessWidget {
+  Message(SmsMessage message)
+      : message = message,
+        super(key: new ObjectKey(message));
 
   final SmsMessage message;
-
-  Message(this.message) : super();
 
   bool get sent => message.kind == SmsMessageKind.Sent;
 
@@ -28,13 +29,11 @@ class Message extends StatelessWidget {
                   new Text(message.body.trim()),
                   new Align(
                     child: new Padding(
-                        padding: new EdgeInsets.only(top: 5.0),
-                        child: new Text(
-                          _time.format(context),
-                          style: new TextStyle(
-                            color: Colors.grey[500]
-                          ),
-                        ),
+                      padding: new EdgeInsets.only(top: 5.0),
+                      child: new Text(
+                        _time.format(context),
+                        style: new TextStyle(color: Colors.grey[500]),
+                      ),
                     ),
                     alignment: Alignment.centerRight,
                   )
@@ -42,9 +41,7 @@ class Message extends StatelessWidget {
               ),
               margin: new EdgeInsets.only(left: 50.0),
               padding: new EdgeInsets.all(10.0),
-              decoration: new BoxDecoration(
-                  color: Colors.yellow[100]
-              ),
+              decoration: new BoxDecoration(color: Colors.yellow[100]),
             ),
           ),
           new Container(
@@ -64,25 +61,30 @@ class Message extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           new Container(
-              child: new CircleAvatar(
-                  child: new Text('C'),
+            child: new CircleAvatar(
+              child: new Text(
+                'C',
+                style: new TextStyle(color: Colors.white),
               ),
-              margin: new EdgeInsets.only(right: 10.0),
+              backgroundColor: ContactColor.getColor(message.address),
+            ),
+            margin: new EdgeInsets.only(right: 10.0),
           ),
           new Expanded(
             child: new Container(
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  new Text(message.body.trim()),
+                  new Text(
+                    message.body.trim(),
+                    style: new TextStyle(color: Colors.white),
+                  ),
                   new Align(
                     child: new Padding(
                       padding: new EdgeInsets.only(top: 5.0),
                       child: new Text(
                         _time.format(context),
-                        style: new TextStyle(
-                            color: Colors.grey
-                        ),
+                        style: new TextStyle(color: Colors.grey[200]),
                       ),
                     ),
                     alignment: Alignment.centerLeft,
@@ -92,8 +94,7 @@ class Message extends StatelessWidget {
               margin: new EdgeInsets.only(right: 50.0),
               padding: new EdgeInsets.all(10.0),
               decoration: new BoxDecoration(
-                color: Colors.grey[300]
-              ),
+                  color: ContactColor.getColor(message.address)),
             ),
           )
         ],
@@ -103,7 +104,6 @@ class Message extends StatelessWidget {
   }
 
   get _time {
-
     return new TimeOfDay(hour: message.date.hour, minute: message.date.minute);
   }
 }

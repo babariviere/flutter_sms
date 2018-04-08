@@ -3,28 +3,28 @@ import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
-
+import 'package:sms_example/utils/colors.dart';
 
 class Avatar extends StatefulWidget {
+  Avatar(Contact contact)
+      : contact = contact,
+        super(key: new ObjectKey(contact));
 
   final Contact contact;
-
-  Avatar(this.contact): super();
 
   @override
   State<Avatar> createState() => new _AvatarState();
 }
 
 class _AvatarState extends State<Avatar> {
-
   Uint8List _bytes;
 
   @override
   void initState() {
     super.initState();
     if (widget.contact.photo != null) {
-      widget.contact.photo.readBytes().then((bytes){
-        setState((){
+      widget.contact.photo.readBytes().then((bytes) {
+        setState(() {
           _bytes = bytes;
         });
       });
@@ -40,7 +40,9 @@ class _AvatarState extends State<Avatar> {
     }
 
     return new CircleAvatar(
-      child: new Text(widget.contact.fullName != null ? widget.contact.fullName[0] : 'C'),
+      backgroundColor: ContactColor.getColor(widget.contact.address),
+      child: new Text(
+          widget.contact.fullName != null ? widget.contact.fullName[0] : 'C'),
     );
   }
 }
