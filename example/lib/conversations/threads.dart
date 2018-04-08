@@ -34,53 +34,36 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
       appBar: new AppBar(
         title: new Text('SMS Conversations'),
       ),
-      body: new Column(
-        children: _getThreadsWidgets(),
-      ),
+      body: _getThreadsWidgets(),
       floatingActionButton: new FloatingActionButton(
         onPressed: () {},
-        child: new Icon(Icons.add_comment),
+        child: new Icon(Icons.add),
       ),
     );
   }
 
-  List<Widget> _getThreadsWidgets() {
-    final widgets = <Widget>[];
-
+  Widget _getThreadsWidgets() {
     if (_loading) {
-      widgets.add(new LinearProgressIndicator());
-      widgets.add(
-        new Expanded(
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Text('Loading conversations...'),
-              new Icon(
-                Icons.chat,
-                color: Colors.grey[500],
-                size: 40.0,
-              ),
-            ],
-          ),
+      return new Center(
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new CircularProgressIndicator(),
+            new Text('Loading conversations...'),
+          ],
         ),
       );
     } else {
-      widgets.add(
-        new Expanded(
-          child: new FadeTransition(
-            opacity: opacityController,
-            child: new ListView.builder(
-                itemCount: _threads.length,
-                itemBuilder: (context, index) {
-                  return new Thread(_threads[index]);
-                }),
-          ),
-        ),
+      return new FadeTransition(
+        opacity: opacityController,
+        child: new ListView.builder(
+            itemCount: _threads.length,
+            itemBuilder: (context, index) {
+              return new Thread(_threads[index]);
+            }),
       );
     }
-
-    return widgets;
   }
 
   void _onSmsReceived(SmsMessage sms) async {
@@ -88,12 +71,18 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
       return thread.id == sms.threadId;
     }, orElse: () {
       var thread = new SmsThread(sms.threadId);
-      _threads.add(thread);
+      _threads.insert(0, thread);
       return thread;
     });
 
     thread.addNewMessage(sms);
     await thread.findContact();
+
+    int index = _threads.indexOf(thread);
+    if (index != 0) {
+      _threads.removeAt(index);
+      _threads.insert(0, thread);
+    }
 
     setState(() {});
   }

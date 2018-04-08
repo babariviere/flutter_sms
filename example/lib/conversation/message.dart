@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_example/conversation/threadStore.dart';
+import 'package:sms_example/conversations/avatar.dart';
 import 'package:sms_example/utils/colors.dart';
 
 class Message extends StatelessWidget {
@@ -61,13 +63,7 @@ class Message extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           new Container(
-            child: new CircleAvatar(
-              child: new Text(
-                'C',
-                style: new TextStyle(color: Colors.white),
-              ),
-              backgroundColor: ContactColor.getColor(message.address),
-            ),
+            child: new Avatar(ThreadStore.of(context).thread.contact),
             margin: new EdgeInsets.only(right: 10.0),
           ),
           new Expanded(
@@ -75,28 +71,24 @@ class Message extends StatelessWidget {
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  new Text(
-                    message.body.trim(),
-                    style: new TextStyle(color: Colors.white),
-                  ),
+                  new Text(message.body.trim()),
                   new Align(
                     child: new Padding(
                       padding: new EdgeInsets.only(top: 5.0),
                       child: new Text(
                         _time.format(context),
-                        style: new TextStyle(color: Colors.grey[200]),
+                        style: new TextStyle(color: Colors.grey),
                       ),
                     ),
                     alignment: Alignment.centerLeft,
-                  )
+                  ),
                 ],
               ),
               margin: new EdgeInsets.only(right: 50.0),
               padding: new EdgeInsets.all(10.0),
-              decoration: new BoxDecoration(
-                  color: ContactColor.getColor(message.address)),
+              decoration: new BoxDecoration(color: Colors.grey[300]),
             ),
-          )
+          ),
         ],
       ),
       margin: new EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),

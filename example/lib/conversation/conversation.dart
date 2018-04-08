@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_example/conversation/formSend.dart';
 import 'package:sms_example/conversation/messages.dart';
+import 'package:sms_example/conversation/threadStore.dart';
 import 'package:sms_example/utils/colors.dart';
 
 class Conversation extends StatefulWidget {
@@ -27,9 +28,12 @@ class _ConversationState extends State<Conversation> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return new ThreadStore(
+      thread: widget.thread,
+      child: new Scaffold(
         appBar: new AppBar(
-          title: new Text(widget.thread.contact.fullName ?? widget.thread.contact.address),
+          title: new Text(
+              widget.thread.contact.fullName ?? widget.thread.contact.address),
           backgroundColor: ContactColor.getColor(widget.thread.contact.address),
         ),
         body: new Column(
@@ -42,7 +46,9 @@ class _ConversationState extends State<Conversation> {
               onMessageSent: _onMessageSent,
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 
   void _onMessageSent(SmsMessage message) {
