@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_example/conversations/thread.dart';
 
@@ -10,9 +11,11 @@ class Threads extends StatefulWidget {
 
 class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   bool _loading = true;
-  List<SmsThread> _threads = <SmsThread>[];
+  List<SmsThread> _threads;
+  Contact _userProfile;
   final SmsQuery _query = new SmsQuery();
   final SmsReceiver _receiver = new SmsReceiver();
+  final ContactQuery _contacts = new ContactQuery();
 
   // Animation
   AnimationController opacityController;
@@ -21,6 +24,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _query.getAllThreads.then(_onThreadsLoaded);
+    _contacts.getUserProfile().then(_onUserProfileLoaded);
     _receiver.onSmsReceived.listen(_onSmsReceived);
 
     // Animation
@@ -60,7 +64,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
         child: new ListView.builder(
             itemCount: _threads.length,
             itemBuilder: (context, index) {
-              return new Thread(_threads[index]);
+              return new Thread(_threads[index], _userProfile);
             }),
       );
     }
@@ -88,10 +92,21 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   }
 
   void _onThreadsLoaded(List<SmsThread> threads) {
-    setState(() {
-      _threads = threads;
-      _loading = false;
-    });
-    opacityController.animateTo(1.0, curve: Curves.easeIn);
+    _threads = threads;
+    _checkIfLoadCompleted();
+  }
+
+  void _onUserProfileLoaded(Contact userProfile) {
+    _userProfile = userProfile;
+    _checkIfLoadCompleted();
+  }
+
+  void _checkIfLoadCompleted() {
+    if (_threads != null && _userProfile != null) {
+      setState(() {
+        _loading = false;
+        opacityController.animateTo(1.0, curve: Curves.easeIn);
+      });
+    }
   }
 }

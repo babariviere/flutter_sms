@@ -171,4 +171,11 @@ class ContactQuery {
           return contact;
         });
   }
+
+  Future<Contact> getUserProfile() async {
+    return await _channel.invokeMethod("getUserProfile").then((dynamic val) {
+      Contact contact = new Contact.fromJson(val['address'], val);
+      return contact;
+    });
+  }
 }

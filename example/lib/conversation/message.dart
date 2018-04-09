@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/sms.dart';
-import 'package:sms_example/conversation/threadStore.dart';
+import 'package:sms_example/conversation/conversationStore.dart';
 import 'package:sms_example/conversations/avatar.dart';
-import 'package:sms_example/utils/colors.dart';
 
 class Message extends StatelessWidget {
   Message(SmsMessage message)
@@ -47,9 +46,7 @@ class Message extends StatelessWidget {
             ),
           ),
           new Container(
-            child: new CircleAvatar(
-              child: new Text('C'),
-            ),
+            child: new Avatar(ConversationStore.of(context).userProfile),
             margin: new EdgeInsets.only(left: 10.0),
           ),
         ],
@@ -63,7 +60,7 @@ class Message extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           new Container(
-            child: new Avatar(ThreadStore.of(context).thread.contact),
+            child: new Avatar(ConversationStore.of(context).thread.contact),
             margin: new EdgeInsets.only(right: 10.0),
           ),
           new Expanded(
