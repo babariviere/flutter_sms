@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_example/conversation/conversation.dart';
 import 'package:sms_example/conversations/avatar.dart';
 import 'package:sms_example/conversations/badge.dart';
 
 class Thread extends StatelessWidget {
-  Thread(SmsThread thread)
+  Thread(SmsThread thread, Contact userProfile)
       : thread = thread,
+        userProfile = userProfile,
         super(key: new ObjectKey(thread));
 
   final SmsThread thread;
+  final Contact userProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +32,6 @@ class Thread extends StatelessWidget {
 
   void _showConversation(BuildContext context) {
     Navigator.of(context).push(
-        new MaterialPageRoute(builder: (context) => new Conversation(thread)));
+        new MaterialPageRoute(builder: (context) => new Conversation(thread, userProfile)));
   }
 }

@@ -1,15 +1,17 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_example/conversation/conversationStore.dart';
 import 'package:sms_example/conversation/formSend.dart';
 import 'package:sms_example/conversation/messages.dart';
-import 'package:sms_example/conversation/threadStore.dart';
 import 'package:sms_example/utils/colors.dart';
 
 class Conversation extends StatefulWidget {
-  Conversation(this.thread) : super();
+  Conversation(this.thread, this.userProfile) : super();
 
   final SmsThread thread;
+  final Contact userProfile;
 
   @override
   State<Conversation> createState() => new _ConversationState();
@@ -28,8 +30,9 @@ class _ConversationState extends State<Conversation> {
 
   @override
   Widget build(BuildContext context) {
-    return new ThreadStore(
+    return new ConversationStore(
       thread: widget.thread,
+      userProfile: widget.userProfile,
       child: new Scaffold(
         appBar: new AppBar(
           title: new Text(
