@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_example/conversation/conversationStore.dart';
 import 'package:sms_example/conversations/avatar.dart';
@@ -19,6 +20,7 @@ class Message extends StatelessWidget {
   }
 
   Widget _buildSentWidget(BuildContext context) {
+    final userProfile = ConversationStore.of(context).userProfile;
     return new Container(
       child: new Row(
         children: <Widget>[
@@ -46,7 +48,7 @@ class Message extends StatelessWidget {
             ),
           ),
           new Container(
-            child: new Avatar(ConversationStore.of(context).userProfile),
+            child: new Avatar(userProfile.photo, userProfile.fullName),
             margin: new EdgeInsets.only(left: 10.0),
           ),
         ],
@@ -56,11 +58,12 @@ class Message extends StatelessWidget {
   }
 
   Widget _buildReceivedWidget(BuildContext context) {
+    final thread = ConversationStore.of(context).thread;
     return new Container(
       child: new Row(
         children: <Widget>[
           new Container(
-            child: new Avatar(ConversationStore.of(context).thread.contact),
+            child: new Avatar(thread.contact.photo, thread.contact.fullName),
             margin: new EdgeInsets.only(right: 10.0),
           ),
           new Expanded(

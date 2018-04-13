@@ -6,11 +6,13 @@ import 'package:sms/contact.dart';
 import 'package:sms_example/utils/colors.dart';
 
 class Avatar extends StatefulWidget {
-  Avatar(Contact contact)
-      : contact = contact,
-        super(key: new ObjectKey(contact));
+  Avatar(Photo photo, String alternativeText)
+      : photo = photo,
+        alternativeText = alternativeText,
+        super(key: new Key(alternativeText));
 
-  final Contact contact;
+  final Photo photo;
+  final String alternativeText;
 
   @override
   State<Avatar> createState() => new _AvatarState();
@@ -22,8 +24,8 @@ class _AvatarState extends State<Avatar> {
   @override
   void initState() {
     super.initState();
-    if (widget.contact.photo != null) {
-      widget.contact.photo.readBytes().then((bytes) {
+    if (widget.photo != null) {
+      widget.photo.readBytes().then((bytes) {
         setState(() {
           _bytes = bytes;
         });
@@ -40,9 +42,9 @@ class _AvatarState extends State<Avatar> {
     }
 
     return new CircleAvatar(
-      backgroundColor: ContactColor.getColor(widget.contact.address),
+      backgroundColor: ContactColor.getColor(widget.alternativeText),
       child: new Text(
-          widget.contact.fullName != null ? widget.contact.fullName[0] : 'C'),
+          widget.alternativeText != null ? widget.alternativeText[0] : 'C'),
     );
   }
 }

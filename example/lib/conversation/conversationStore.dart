@@ -12,7 +12,7 @@ class ConversationStore extends InheritedWidget {
       : super(key: key, child: child);
 
   final SmsThread thread;
-  final Contact userProfile;
+  final UserProfile userProfile;
 
   static ConversationStore of(BuildContext context) {
     return context.inheritFromWidgetOfExactType(ConversationStore);

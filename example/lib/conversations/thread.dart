@@ -7,18 +7,18 @@ import 'package:sms_example/conversations/avatar.dart';
 import 'package:sms_example/conversations/badge.dart';
 
 class Thread extends StatelessWidget {
-  Thread(SmsThread thread, Contact userProfile)
+  Thread(SmsThread thread, UserProfile userProfile)
       : thread = thread,
         userProfile = userProfile,
         super(key: new ObjectKey(thread));
 
   final SmsThread thread;
-  final Contact userProfile;
+  final UserProfile userProfile;
 
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      leading: new Avatar(thread.contact),
+      leading: new Avatar(thread.contact.photo, thread.contact.fullName),
       title: new Text(thread.contact.fullName ?? thread.contact.address),
       subtitle: new Text(
         thread.messages.first.body.trim(),
