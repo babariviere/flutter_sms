@@ -12,10 +12,10 @@ class Threads extends StatefulWidget {
 class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   bool _loading = true;
   List<SmsThread> _threads;
-  Contact _userProfile;
+  UserProfile _userProfile;
   final SmsQuery _query = new SmsQuery();
   final SmsReceiver _receiver = new SmsReceiver();
-  final ContactQuery _contacts = new ContactQuery();
+  final UserProfileProvider _userProfileProvider = new UserProfileProvider();
 
   // Animation
   AnimationController opacityController;
@@ -24,7 +24,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _query.getAllThreads.then(_onThreadsLoaded);
-    _contacts.getUserProfile().then(_onUserProfileLoaded);
+    _userProfileProvider.getUserProfile().then(_onUserProfileLoaded);
     _receiver.onSmsReceived.listen(_onSmsReceived);
 
     // Animation
@@ -96,7 +96,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
     _checkIfLoadCompleted();
   }
 
-  void _onUserProfileLoaded(Contact userProfile) {
+  void _onUserProfileLoaded(UserProfile userProfile) {
     _userProfile = userProfile;
     _checkIfLoadCompleted();
   }

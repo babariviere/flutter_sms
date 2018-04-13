@@ -27,8 +27,7 @@ class Photo {
   Future<Uint8List> readBytes({bool fullSize = false}) async {
     if (fullSize) {
       return await _readFullSizeBytes();
-    }
-    else {
+    } else {
       return await _readThumbnailBytes();
     }
   }
@@ -37,7 +36,7 @@ class Photo {
     if (this._thumbnailUri != null && this._thumbnailBytes == null) {
       var photoQuery = new ContactPhotoQuery();
       this._thumbnailBytes =
-      await photoQuery.queryContactPhoto(this._thumbnailUri);
+          await photoQuery.queryContactPhoto(this._thumbnailUri);
     }
     return _thumbnailBytes;
   }
@@ -46,7 +45,7 @@ class Photo {
     if (this._photoUri != null && this._bytes == null) {
       var photoQuery = new ContactPhotoQuery();
       this._bytes =
-      await photoQuery.queryContactPhoto(this._photoUri, fullSize: true);
+          await photoQuery.queryContactPhoto(this._photoUri, fullSize: true);
     }
     return _bytes;
   }
@@ -54,7 +53,6 @@ class Photo {
 
 /// A contact's photo query
 class ContactPhotoQuery {
-
   static ContactPhotoQuery _instance;
   final MethodChannel _channel;
 
@@ -116,7 +114,7 @@ class Contact {
     }
     if (data.containsKey("photo") && data.containsKey("thumbnail")) {
       this._photo =
-      new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
+          new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
   }
 
@@ -154,28 +152,70 @@ class ContactQuery {
 
   Future<Contact> queryContact(String address) async {
     if (address == null) {
-      throw("address is null");
+      throw ("address is null");
     }
     if (queried.containsKey(address) && queried[address] != null) {
       return queried[address];
     }
     if (inProgress.containsKey(address) && inProgress[address] == true) {
-      throw("already requested");
+      throw ("already requested");
     }
     inProgress[address] = true;
-    return await _channel.invokeMethod("getContact", {"address": address}).then(
-            (dynamic val) {
-          Contact contact = new Contact.fromJson(address, val);
-          queried[address] = contact;
-          inProgress[address] = false;
-          return contact;
-        });
+    return await _channel
+        .invokeMethod("getContact", {"address": address}).then((dynamic val) {
+      Contact contact = new Contact.fromJson(address, val);
+      queried[address] = contact;
+      inProgress[address] = false;
+      return contact;
+    });
+  }
+}
+
+class UserProfile {
+  String _fullName;
+  Photo _photo;
+  List<String> _addresses;
+
+  UserProfile();
+
+  UserProfile._fromJson(Map data) {
+    if (data.containsKey("fullName")) {
+      this._fullName = data["fullName"];
+    }
+    if (data.containsKey("photo") && data.containsKey("thumbnail")) {
+      this._photo =
+          new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
+    }
+    if (data.containsKey("addresses")) {
+      _addresses = data["addresses"];
+    }
   }
 
-  Future<Contact> getUserProfile() async {
+  String get fullName => _fullName;
+
+  Photo get photo => _photo;
+
+  List<String> get addresses => _addresses;
+}
+
+class UserProfileProvider {
+  static UserProfileProvider _instance;
+  final MethodChannel _channel;
+
+  factory UserProfileProvider() {
+    if (_instance == null) {
+      final MethodChannel methodChannel = const MethodChannel(
+          "plugins.babariviere.com/userProfile", const JSONMethodCodec());
+      _instance = new UserProfileProvider._private(methodChannel);
+    }
+    return _instance;
+  }
+
+  UserProfileProvider._private(this._channel);
+
+  Future<UserProfile> getUserProfile() async {
     return await _channel.invokeMethod("getUserProfile").then((dynamic val) {
-      Contact contact = new Contact.fromJson(val['address'], val);
-      return contact;
+      return new UserProfile._fromJson(val);
     });
   }
 }

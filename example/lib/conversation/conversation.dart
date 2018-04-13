@@ -11,7 +11,7 @@ class Conversation extends StatefulWidget {
   Conversation(this.thread, this.userProfile) : super();
 
   final SmsThread thread;
-  final Contact userProfile;
+  final UserProfile userProfile;
 
   @override
   State<Conversation> createState() => new _ConversationState();
@@ -37,7 +37,7 @@ class _ConversationState extends State<Conversation> {
         appBar: new AppBar(
           title: new Text(
               widget.thread.contact.fullName ?? widget.thread.contact.address),
-          backgroundColor: ContactColor.getColor(widget.thread.contact.address),
+          backgroundColor: ContactColor.getColor(widget.thread.contact.fullName),
         ),
         body: new Column(
           children: <Widget>[
