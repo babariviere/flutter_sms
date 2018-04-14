@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
@@ -179,15 +180,16 @@ class UserProfile {
   UserProfile();
 
   UserProfile._fromJson(Map data) {
-    if (data.containsKey("fullName")) {
-      this._fullName = data["fullName"];
+    if (data.containsKey("name")) {
+      this._fullName = data["name"];
     }
     if (data.containsKey("photo") && data.containsKey("thumbnail")) {
       this._photo =
           new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
     if (data.containsKey("addresses")) {
-      _addresses = data["addresses"];
+      _addresses = new List<String>();
+      _addresses.addAll(data["addresses"]);
     }
   }
 

@@ -2,12 +2,14 @@ package com.babariviere.sms;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,8 +37,23 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void queryUserProfile() {
+        try {
+            JSONObject obj = getProfileObject();
+            if (obj != null) {
+                obj.put("addresses", getProfileAddresses(obj.getString("id")));
+            }
+            result.success(obj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private JSONObject getProfileObject() {
+        JSONObject obj = new JSONObject();
+
         String[] projection = new String[]{
                 ContactsContract.Profile._ID,
                 ContactsContract.Profile.DISPLAY_NAME,
@@ -44,9 +61,7 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
                 ContactsContract.Profile.PHOTO_THUMBNAIL_URI,
         };
 
-        JSONObject obj = new JSONObject();
-        Cursor cursor = registrar.context().getContentResolver().query(
-                ContactsContract.Profile.CONTENT_URI, projection, null, null, null);
+        Cursor cursor = getContentResolver().query(ContactsContract.Profile.CONTENT_URI, projection, null, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 try {
@@ -59,42 +74,45 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
                 }
             }
             cursor.close();
+        } else {
+            return null;
         }
 
-        if (!obj.isNull("id")) {
-            try {
-                Uri contentUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, obj.getString("id"));
-                Uri uri = Uri.withAppendedPath(contentUri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+        return obj;
+    }
 
-                projection = new String[]{
-                        ContactsContract.Contacts.Entity.RAW_CONTACT_ID,
-                        ContactsContract.Contacts.Entity.DATA1,
-                        ContactsContract.Contacts.Entity.MIMETYPE
-                };
 
-                cursor = registrar
-                        .context()
-                        .getContentResolver()
-                        .query(
-                                uri,
-                                projection,
-                                null,
-                                null,
-                                null
-                        );
-                if (cursor != null) {
-                    while (cursor.moveToNext()) {
-                        System.out.println(cursor.getString(1) + " - " + cursor.getString(2));
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private JSONArray getProfileAddresses(String profileId) {
+        JSONArray addressCollection = new JSONArray();
+        if (profileId != null) {
+            Uri contentUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, profileId);
+            Uri uri = Uri.withAppendedPath(contentUri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+
+            String[] projection = new String[]{
+                    ContactsContract.Contacts.Entity.DATA1,
+                    ContactsContract.Contacts.Entity.MIMETYPE
+            };
+
+            Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+
+            if (cursor != null) {
+                cursor.moveToFirst();
+                do {
+                    if (cursor.getString(1).equals("vnd.android.cursor.item/phone_v2")) {
+                        addressCollection.put(cursor.getString(0));
                     }
-                    cursor.close();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+                while (cursor.moveToNext());
+                cursor.close();
             }
-
         }
 
-        result.success(obj);
+        return addressCollection;
+    }
+
+    private ContentResolver getContentResolver() {
+        return registrar.context().getContentResolver();
     }
 
     @Override

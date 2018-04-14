@@ -20,7 +20,7 @@ import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultLi
 @TargetApi(Build.VERSION_CODES.DONUT)
 class SmsSenderMethodHandler implements RequestPermissionsResultListener {
   private static final SmsManager sms = SmsManager.getDefault();
-  private final String[] permissionsList = new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE};
+  private final String[] permissionsList = new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission_group.SMS};
   private MethodChannel.Result result;
   private String address;
   private String body;
