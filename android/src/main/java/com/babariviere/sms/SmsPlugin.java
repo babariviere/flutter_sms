@@ -52,5 +52,7 @@ public class SmsPlugin {
     final UserProfileProvider userProfileProvider = new UserProfileProvider(registrar);
     final MethodChannel userProfileProviderChannel = new MethodChannel(registrar.messenger(), USER_PROFILE, JSONMethodCodec.INSTANCE);
     userProfileProviderChannel.setMethodCallHandler(userProfileProvider);
+
+    registrar.addRequestPermissionsResultListener(new PermissionsHandler(registrar));
   }
 }
