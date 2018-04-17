@@ -5,9 +5,9 @@ import 'package:sms/sms.dart';
 typedef void MessageSentCallback(SmsMessage message);
 
 class FormSend extends StatelessWidget {
-
   final SmsThread thread;
-  final TextEditingController _textFieldController = new TextEditingController();
+  final TextEditingController _textFieldController =
+      new TextEditingController();
   final SmsSender _sender = new SmsSender();
 
   final MessageSentCallback onMessageSent;
@@ -27,8 +27,7 @@ class FormSend extends StatelessWidget {
                 decoration: new InputDecoration(
                     border: InputBorder.none,
                     labelStyle: new TextStyle(fontSize: 16.0),
-                    hintText: "Send message:"
-                ),
+                    hintText: "Send message:"),
               ),
               padding: new EdgeInsets.only(left: 20.0, top: 8.0, bottom: 8.0),
             ),
@@ -44,13 +43,9 @@ class FormSend extends StatelessWidget {
   }
 
   void _sendMessage() async {
-    final message = await _sender.sendSms(
-        new SmsMessage(
-            thread.address,
-            _textFieldController.text,
-            threadId: thread.id
-        )
-    );
+    final message = await _sender.sendSms(new SmsMessage(
+        thread.address, _textFieldController.text,
+        threadId: thread.id));
     _textFieldController.clear();
     onMessageSent(message);
   }
