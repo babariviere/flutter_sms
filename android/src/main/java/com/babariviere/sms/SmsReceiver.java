@@ -31,7 +31,7 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
   private final Registrar registrar;
   private BroadcastReceiver receiver;
   private final Permissions permissions;
-  private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS};
+  private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS};
   private EventSink sink;
 
   SmsReceiver(Registrar registrar) {
@@ -95,6 +95,7 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
 
   @Override
   public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    System.out.println("onRequestPermissionsResult");
     if (requestCode != Permissions.RECV_SMS_ID_REQ) {
       return false;
     }
@@ -105,6 +106,8 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
         break;
       }
     }
+    System.out.println("GRANTED");
+    System.out.println(isOk);
     if (isOk) {
       return true;
     }

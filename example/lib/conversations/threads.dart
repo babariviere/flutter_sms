@@ -23,9 +23,9 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _query.getAllThreads.then(_onThreadsLoaded);
+    _receiver.onSmsReceived.listen(_onSmsReceived);
     _userProfileProvider.getUserProfile().then(_onUserProfileLoaded);
-    //_receiver.onSmsReceived.listen(_onSmsReceived);
+    _query.getAllThreads.then(_onThreadsLoaded);
 
     // Animation
     opacityController = new AnimationController(
