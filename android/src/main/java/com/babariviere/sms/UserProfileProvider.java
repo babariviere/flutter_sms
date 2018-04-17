@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 
+import com.babariviere.sms.permisions.Permissions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
