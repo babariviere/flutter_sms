@@ -21,6 +21,9 @@ public class SmsPlugin {
    * Plugin registration.
    */
   public static void registerWith(Registrar registrar) {
+
+    registrar.addRequestPermissionsResultListener(new PermissionsHandler(registrar));
+
     // SMS receiver
     final SmsReceiver receiver = new SmsReceiver(registrar);
     final EventChannel recvSmsChannel = new EventChannel(registrar.messenger(),
@@ -52,7 +55,5 @@ public class SmsPlugin {
     final UserProfileProvider userProfileProvider = new UserProfileProvider(registrar);
     final MethodChannel userProfileProviderChannel = new MethodChannel(registrar.messenger(), USER_PROFILE, JSONMethodCodec.INSTANCE);
     userProfileProviderChannel.setMethodCallHandler(userProfileProvider);
-
-    registrar.addRequestPermissionsResultListener(new PermissionsHandler(registrar));
   }
 }
