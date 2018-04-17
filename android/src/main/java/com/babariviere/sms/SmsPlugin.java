@@ -1,5 +1,7 @@
 package com.babariviere.sms;
 
+import com.babariviere.sms.permisions.Permissions;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.StandardMethodCodec;
@@ -15,11 +17,15 @@ public class SmsPlugin {
   private static final String CHANNEL_QUER = "plugins.babariviere.com/querySMS";
   private static final String CHANNEL_QUER_CONT = "plugins.babariviere.com/queryContact";
   private static final String CHANNEL_QUER_CONT_PHOTO = "plugins.babariviere.com/queryContactPhoto";
+  private static final String USER_PROFILE = "plugins.babariviere.com/userProfile";
 
   /**
    * Plugin registration.
    */
   public static void registerWith(Registrar registrar) {
+
+    registrar.addRequestPermissionsResultListener(Permissions.getRequestsResultsListener());
+
     // SMS receiver
     final SmsReceiver receiver = new SmsReceiver(registrar);
     final EventChannel recvSmsChannel = new EventChannel(registrar.messenger(),
@@ -46,5 +52,10 @@ public class SmsPlugin {
     final ContactPhotoQuery contactPhotoQuery = new ContactPhotoQuery(registrar);
     final MethodChannel queryContactPhotoChannel = new MethodChannel(registrar.messenger(), CHANNEL_QUER_CONT_PHOTO, StandardMethodCodec.INSTANCE);
     queryContactPhotoChannel.setMethodCallHandler(contactPhotoQuery);
+
+    /// User Profile
+    final UserProfileProvider userProfileProvider = new UserProfileProvider(registrar);
+    final MethodChannel userProfileProviderChannel = new MethodChannel(registrar.messenger(), USER_PROFILE, JSONMethodCodec.INSTANCE);
+    userProfileProviderChannel.setMethodCallHandler(userProfileProvider);
   }
 }

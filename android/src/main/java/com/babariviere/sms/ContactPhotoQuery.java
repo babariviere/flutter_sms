@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 
+import com.babariviere.sms.permisions.Permissions;
+
 import java.io.IOException;
 import java.io.InputStream;
 
