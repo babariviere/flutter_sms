@@ -29,7 +29,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
 
     // Animation
     opacityController = new AnimationController(
-        duration: const Duration(milliseconds: 600), vsync: this, value: 0.0);
+        duration: const Duration(milliseconds: 500), vsync: this, value: 0.0);
   }
 
   @override
