@@ -3,6 +3,8 @@
 * SmsDelivery report
 * Automatically assign contact to created SmsThread
 * Small fix for 'date' and 'dateSent' of SmsMessage
+* Fixed error on multiple permissions requests
+* Get basic User Profile info.
 
 ## [0.0.9] - 2018-03-15
 
