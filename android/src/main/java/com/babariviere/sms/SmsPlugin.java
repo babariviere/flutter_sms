@@ -22,7 +22,7 @@ public class SmsPlugin {
    */
   public static void registerWith(Registrar registrar) {
 
-    registrar.addRequestPermissionsResultListener(new PermissionsHandler(registrar));
+    registrar.addRequestPermissionsResultListener(new PermissionsRequestHandler());
 
     // SMS receiver
     final SmsReceiver receiver = new SmsReceiver(registrar);

@@ -5,9 +5,8 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import io.flutter.plugin.common.PluginRegistry;
 
@@ -15,35 +14,47 @@ import io.flutter.plugin.common.PluginRegistry;
  * Created by babariviere on 08/03/18.
  */
 
-class PermissionsHandler implements PluginRegistry.RequestPermissionsResultListener {
-    private static Map<Integer, String[]> requestedPermissions = new HashMap<>();
-    private static PluginRegistry.Registrar registrar;
+class PermissionsRequest {
+    private int id;
+    private Activity activity;
+    private String[] permissions;
 
-    @TargetApi(Build.VERSION_CODES.M)
-    static void requestPermissions(String[] permissions, int id) {
-        if (requestedPermissions.size() > 0) {
-            requestedPermissions.put(id, permissions);
-        } else {
-            requestedPermissions.put(id, permissions);
-            registrar.activity().requestPermissions(permissions, id);
-        }
+    PermissionsRequest(int id, String[] permissions, Activity activity) {
+        this.id = id;
+        this.permissions = permissions;
+        this.activity = activity;
     }
 
-    PermissionsHandler(PluginRegistry.Registrar registrar) {
-        PermissionsHandler.registrar = registrar;
+    int getId() {
+        return this.id;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    void execute() {
+        this.activity.requestPermissions(this.permissions, this.id);
+    }
+}
+
+class PermissionsRequestHandler implements PluginRegistry.RequestPermissionsResultListener {
+    private static Queue<PermissionsRequest> requests = new LinkedBlockingQueue<>();
+    private static boolean isRequesting = false;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    static void requestPermissions(PermissionsRequest permissionsRequest) {
+        if (!isRequesting) {
+            isRequesting = true;
+            permissionsRequest.execute();
+        } else {
+            requests.add(permissionsRequest);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (!requestedPermissions.containsKey(requestCode)) {
-            return false;
-        }
-
-        requestedPermissions.remove(requestCode);
-        if (requestedPermissions.keySet().size() > 0) {
-            Integer key = (Integer) requestedPermissions.keySet().toArray()[0];
-            registrar.activity().requestPermissions(requestedPermissions.get(key), key);
+        isRequesting = requests.size() > 0;
+        if (isRequesting) {
+            requests.poll().execute();
         }
 
         return false;
@@ -80,7 +91,9 @@ class Permissions {
             return true;
         }
         if (!hasPermissions(permissions)) {
-            PermissionsHandler.requestPermissions(permissions, id);
+            PermissionsRequestHandler.requestPermissions(
+                    new PermissionsRequest(id, permissions, activity)
+            );
             return false;
         }
         return true;
