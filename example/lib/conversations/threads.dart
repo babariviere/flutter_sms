@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_example/conversations/thread.dart';
 
@@ -8,18 +9,27 @@ class Threads extends StatefulWidget {
   State<Threads> createState() => new _ThreadsState();
 }
 
-class _ThreadsState extends State<Threads> {
-
+class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   bool _loading = true;
-  List<SmsThread> _threads = <SmsThread>[];
+  List<SmsThread> _threads;
+  UserProfile _userProfile;
   final SmsQuery _query = new SmsQuery();
   final SmsReceiver _receiver = new SmsReceiver();
+  final UserProfileProvider _userProfileProvider = new UserProfileProvider();
+
+  // Animation
+  AnimationController opacityController;
 
   @override
   void initState() {
     super.initState();
-    _query.getAllThreads.then(_onThreadsLoaded);
     _receiver.onSmsReceived.listen(_onSmsReceived);
+    _userProfileProvider.getUserProfile().then(_onUserProfileLoaded);
+    _query.getAllThreads.then(_onThreadsLoaded);
+
+    // Animation
+    opacityController = new AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this, value: 0.0);
   }
 
   @override
@@ -28,72 +38,68 @@ class _ThreadsState extends State<Threads> {
       appBar: new AppBar(
         title: new Text('SMS Conversations'),
       ),
-      body: new Column(
-        children: _getThreadsWidgets(),
+      body: _getThreadsWidgets(),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: () {},
+        child: new Icon(Icons.add),
       ),
     );
   }
 
-  List<Widget> _getThreadsWidgets() {
-    final widgets = <Widget>[];
-
+  Widget _getThreadsWidgets() {
     if (_loading) {
-      widgets.add(new LinearProgressIndicator());
-      widgets.add(
-          new Expanded(
-              child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Text('Loading conversations...'),
-                    new Icon(
-                        Icons.chat,
-                        color: Colors.grey[500],
-                        size: 40.0,
-                    ),
-                  ],
-              ),
-          ),
+      return new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      return new FadeTransition(
+        opacity: opacityController,
+        child: new ListView.builder(
+            itemCount: _threads.length,
+            itemBuilder: (context, index) {
+              return new Thread(_threads[index], _userProfile);
+            }),
       );
     }
-    else {
-      widgets.add(
-        new Expanded(
-          child: new ListView.builder(
-              itemCount: _threads.length,
-              itemBuilder: (context, index) {
-                return new Thread(_threads[index]);
-              }
-          ),
-        ),
-      );
-    }
-
-    return widgets;
   }
 
   void _onSmsReceived(SmsMessage sms) async {
-    var thread = _threads.singleWhere(
-            (thread){
-              return thread.id == sms.threadId;
-            },
-            orElse: (){
-              var thread = new SmsThread(sms.threadId);
-              _threads.add(thread);
-              return thread;
-            }
-    );
+    var thread = _threads.singleWhere((thread) {
+      return thread.id == sms.threadId;
+    }, orElse: () {
+      var thread = new SmsThread(sms.threadId);
+      _threads.insert(0, thread);
+      return thread;
+    });
 
     thread.addNewMessage(sms);
     await thread.findContact();
 
-    setState((){});
+    int index = _threads.indexOf(thread);
+    if (index != 0) {
+      _threads.removeAt(index);
+      _threads.insert(0, thread);
+    }
+
+    setState(() {});
   }
 
   void _onThreadsLoaded(List<SmsThread> threads) {
-    setState((){
-      _threads = threads;
-      _loading = false;
-    });
+    _threads = threads;
+    _checkIfLoadCompleted();
+  }
+
+  void _onUserProfileLoaded(UserProfile userProfile) {
+    _userProfile = userProfile;
+    _checkIfLoadCompleted();
+  }
+
+  void _checkIfLoadCompleted() {
+    if (_threads != null && _userProfile != null) {
+      setState(() {
+        _loading = false;
+        opacityController.animateTo(1.0, curve: Curves.easeIn);
+      });
+    }
   }
 }
