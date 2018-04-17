@@ -95,7 +95,6 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
 
   @Override
   public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    System.out.println("onRequestPermissionsResult");
     if (requestCode != Permissions.RECV_SMS_ID_REQ) {
       return false;
     }
@@ -106,8 +105,6 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
         break;
       }
     }
-    System.out.println("GRANTED");
-    System.out.println(isOk);
     if (isOk) {
       return true;
     }
