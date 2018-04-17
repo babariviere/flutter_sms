@@ -122,7 +122,7 @@ and a Future is retorned._
 
 ## User Profile
 
-Some times is usefull to request basic info of the phone owner, like the photo, phones, etc.
+Some times it is useful to request basic info of the phone owner, like the contact photo, addresses, etc.
 
 ```dart
 import 'package:sms/contact.dart';
@@ -174,6 +174,7 @@ void main() {
 - [ ] Multi Sim Card
 - [x] Contact
 - [x] Contact Photo (full size, thumbnail)
+- [x] User profile (basic info)
 
 ## Contributions
 
