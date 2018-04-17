@@ -1,5 +1,7 @@
 package com.babariviere.sms;
 
+import com.babariviere.sms.permisions.Permissions;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.StandardMethodCodec;
@@ -22,7 +24,7 @@ public class SmsPlugin {
    */
   public static void registerWith(Registrar registrar) {
 
-    registrar.addRequestPermissionsResultListener(new PermissionsRequestHandler());
+    registrar.addRequestPermissionsResultListener(Permissions.getRequestsResultsListener());
 
     // SMS receiver
     final SmsReceiver receiver = new SmsReceiver(registrar);

@@ -49,14 +49,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   Widget _getThreadsWidgets() {
     if (_loading) {
       return new Center(
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new CircularProgressIndicator(),
-            new Text('Loading conversations...'),
-          ],
-        ),
+        child: new CircularProgressIndicator(),
       );
     } else {
       return new FadeTransition(
@@ -92,13 +85,11 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   }
 
   void _onThreadsLoaded(List<SmsThread> threads) {
-    print('_onThreadsLoaded');
     _threads = threads;
     _checkIfLoadCompleted();
   }
 
   void _onUserProfileLoaded(UserProfile userProfile) {
-    print('_onUserProfileLoaded');
     _userProfile = userProfile;
     _checkIfLoadCompleted();
   }
