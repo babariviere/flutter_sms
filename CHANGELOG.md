@@ -1,6 +1,5 @@
 ## [0.0.10] - 2018-04-18
 
-* SmsDelivery report
 * Automatically assign contact to created SmsThread
 * Small fix for 'date' and 'dateSent' of SmsMessage
 * Fixed error on multiple permissions requests
