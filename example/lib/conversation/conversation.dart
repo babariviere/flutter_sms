@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
+import './formSend.dart';
+import './messages.dart';
+import '../utils/colors.dart';
+import './conversationStore.dart';
 
 class Conversation extends StatefulWidget {
   Conversation(this.thread, this.userProfile) : super();
