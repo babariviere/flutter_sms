@@ -35,7 +35,7 @@ public class SmsPlugin {
         receiveSmsChannel.setStreamHandler(receiver);
 
         // SMS status receiver
-        new EventChannel(registrar.messenger(), CHANNEL_SMS_STATUS, JSONMethodCodec.INSTANCE)
+        new EventChannel(registrar.messenger(), CHANNEL_SMS_STATUS)
                 .setStreamHandler(new SmsStateHandler(registrar));
 
         /// SMS sender

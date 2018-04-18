@@ -23,9 +23,6 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _dateSent;
   SmsMessageKind _kind;
 
-  static const EventChannel stateChannel =
-  const EventChannel('samples.flutter.io/charging');
-
   SmsMessage(this._address, this._body,
       {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
     this._id = id;
@@ -253,17 +250,28 @@ class SmsReceiver {
 class SmsSender {
   static SmsSender _instance;
   final MethodChannel _channel;
+  final EventChannel _stateChannel;
 
   factory SmsSender() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
           "plugins.babariviere.com/sendSMS", const JSONMethodCodec());
-      _instance = new SmsSender._private(methodChannel);
+
+      final EventChannel stateChannel = const EventChannel(
+          "plugins.babariviere.com/statusSMS");
+
+      _instance = new SmsSender._private(methodChannel, stateChannel);
     }
     return _instance;
   }
 
-  SmsSender._private(this._channel);
+  SmsSender._private(this._channel, this._stateChannel) {
+    this._stateChannel.receiveBroadcastStream().listen((Object event){
+      print("Event: " + event);
+    }, onError: (PlatformException error){
+      print("Error: " + error.message);
+    });
+  }
 
   /// Send an SMS
   ///

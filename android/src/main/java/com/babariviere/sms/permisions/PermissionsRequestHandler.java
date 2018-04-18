@@ -18,6 +18,7 @@ class PermissionsRequestHandler implements PluginRegistry.RequestPermissionsResu
 
     @TargetApi(Build.VERSION_CODES.M)
     static void requestPermissions(PermissionsRequest permissionsRequest) {
+        System.out.println("requesting permission: " + permissionsRequest.getId());
         if (!isRequesting) {
             isRequesting = true;
             permissionsRequest.execute();

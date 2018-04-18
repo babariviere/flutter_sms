@@ -1,6 +1,7 @@
 package com.babariviere.sms.status;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,12 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onReceive(Context context, Intent intent) {
-        eventSink.success(SmsStatus.SMS_RECEIVED);
+        System.out.println("onReceive");
+        if (getResultCode() == Activity.RESULT_OK) {
+            eventSink.success("received");
+        }
+        else {
+            eventSink.error("bad", "bad", "bad");
+        }
     }
 }
