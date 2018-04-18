@@ -23,6 +23,9 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _dateSent;
   SmsMessageKind _kind;
 
+  static const EventChannel stateChannel =
+  const EventChannel('samples.flutter.io/charging');
+
   SmsMessage(this._address, this._body,
       {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
     this._id = id;
