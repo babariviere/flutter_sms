@@ -1,10 +1,11 @@
-## [0.0.10] - WIP
+## [0.0.10] - 2018-04-18
 
 * SmsDelivery report
 * Automatically assign contact to created SmsThread
 * Small fix for 'date' and 'dateSent' of SmsMessage
 * Fixed error on multiple permissions requests
 * Get basic User Profile info.
+* Fix gradle build
 
 ## [0.0.9] - 2018-03-15
 
