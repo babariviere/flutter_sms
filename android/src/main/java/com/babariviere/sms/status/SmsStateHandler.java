@@ -3,11 +3,9 @@ package com.babariviere.sms.status;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.provider.Telephony;
 
 import com.babariviere.sms.permisions.Permissions;
 
@@ -40,16 +38,25 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
                 new String[]{Manifest.permission.RECEIVE_SMS},
                 Permissions.BROADCAST_SMS)){
             System.out.println("SmsStateHandler.onListen.hasPermissions");
-            registerReceiver();
+            registerDeliveredReceiver();
+            registerSentReceiver();
         }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void registerReceiver() {
-        System.out.println("registering receiver");
+    private void registerDeliveredReceiver() {
+        System.out.println("registering delivered receiver");
         registrar.context().registerReceiver(
                 smsStateChangeReceiver,
                 new IntentFilter("SMS_DELIVERED"));
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void registerSentReceiver() {
+        System.out.println("registering sent receiver");
+        registrar.context().registerReceiver(
+                smsStateChangeReceiver,
+                new IntentFilter("SMS_SENT"));
     }
 
     @Override
@@ -72,7 +79,8 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
             }
         }
         if (isOk) {
-            registerReceiver();
+            registerDeliveredReceiver();
+            registerSentReceiver();
             return true;
         }
         eventSink.error("#01", "permission denied", null);
