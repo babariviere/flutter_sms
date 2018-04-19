@@ -270,6 +270,7 @@ class SmsSender {
   static SmsSender _instance;
   final MethodChannel _channel;
   final EventChannel _stateChannel;
+  Stream<dynamic> _onSmsStatusChange;
 
   factory SmsSender() {
     if (_instance == null) {
@@ -284,7 +285,9 @@ class SmsSender {
     return _instance;
   }
 
-  SmsSender._private(this._channel, this._stateChannel);
+  SmsSender._private(this._channel, this._stateChannel) {
+    _onSmsStatusChange = _stateChannel.receiveBroadcastStream();
+  }
 
   /// Send an SMS
   ///
@@ -311,7 +314,7 @@ class SmsSender {
         kind: SmsMessageKind.Sent
     );
 
-    _stateChannel.receiveBroadcastStream().listen((Object state){
+    _onSmsStatusChange.listen((Object state){
       switch(state.toString()){
         case 'sent':
           message.state = SmsMessageState.Sent;
