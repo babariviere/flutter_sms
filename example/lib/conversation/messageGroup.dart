@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sms_example/conversation/message.dart';
-import 'package:sms_example/utils/group.dart';
+import './message.dart';
+import '../utils/group.dart';
 
 class MessageGroup extends StatelessWidget {
   final Group group;
