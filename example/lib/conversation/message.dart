@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
-import 'package:sms_example/conversation/conversationStore.dart';
-import 'package:sms_example/conversations/avatar.dart';
+import './conversationStore.dart';
+import '../conversations/avatar.dart';
 
 class Message extends StatelessWidget {
   Message(SmsMessage message)
