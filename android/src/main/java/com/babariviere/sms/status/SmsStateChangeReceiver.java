@@ -32,8 +32,21 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
             if (intent.getExtras() != null) {
                 System.out.println("format: " + intent.getStringExtra("format"));
                 System.out.println(Arrays.toString(intent.getByteArrayExtra("pdu")));
+                System.out.println(intent.getAction());
+                System.out.println(intent.getDataString());
             }
-            eventSink.success("received");
+
+            String action = intent.getAction();
+            switch (action != null ? action : "none") {
+                case "SMS_SENT":
+                    eventSink.success("sent");
+                    break;
+                case "SMS_DELIVERED":
+                    eventSink.success("delivered");
+                    break;
+                default:
+                    eventSink.success("none");
+            }
         }
         else {
             eventSink.error("bad", "bad", "bad");

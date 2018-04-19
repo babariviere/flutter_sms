@@ -6,6 +6,13 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
+enum SmsMessageState {
+  Sending,
+  Sent,
+  Delivered,
+  None,
+}
+
 enum SmsMessageKind {
   Sent,
   Received,
@@ -22,6 +29,9 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _date;
   DateTime _dateSent;
   SmsMessageKind _kind;
+  SmsMessageState _state = SmsMessageState.None;
+  int _otherId = 0;
+  static int _currentVal = 0;
 
   SmsMessage(this._address, this._body,
       {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
@@ -31,6 +41,8 @@ class SmsMessage implements Comparable<SmsMessage> {
     this._date = date;
     this._dateSent = dateSent;
     this._kind = kind;
+
+    _otherId = _currentVal++;
   }
 
   /// Read message fron JSON
@@ -64,6 +76,8 @@ class SmsMessage implements Comparable<SmsMessage> {
     if (data.containsKey("date_sent")) {
       this._dateSent = new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
+
+    _otherId = _currentVal++;
   }
 
   /// Convert SMS to map
@@ -125,6 +139,11 @@ class SmsMessage implements Comparable<SmsMessage> {
 
   /// Set message date
   set date(DateTime date) => this._date = date;
+
+  set state(SmsMessageState state) {
+    this._state = state;
+    print("state for: " + _otherId.toString() + " is " + state.toString());
+  }
 
   @override
   int compareTo(SmsMessage other) {
@@ -265,13 +284,7 @@ class SmsSender {
     return _instance;
   }
 
-  SmsSender._private(this._channel, this._stateChannel) {
-    this._stateChannel.receiveBroadcastStream().listen((Object event){
-      print("Event: " + event);
-    }, onError: (PlatformException error){
-      print("Error: " + error.message);
-    });
-  }
+  SmsSender._private(this._channel, this._stateChannel);
 
   /// Send an SMS
   ///
@@ -290,13 +303,28 @@ class SmsSender {
       return null;
     }
     await _channel.invokeMethod("sendSMS", msg.toMap);
-    return new SmsMessage(
+    SmsMessage message = new SmsMessage(
         msg.address,
         msg.body,
         threadId: msg.threadId,
         date: new DateTime.now(),
         kind: SmsMessageKind.Sent
     );
+
+    _stateChannel.receiveBroadcastStream().listen((Object state){
+      switch(state.toString()){
+        case 'sent':
+          message.state = SmsMessageState.Sent;
+          break;
+        case 'delivered':
+          message.state = SmsMessageState.Delivered;
+          break;
+      }
+    }, onError: (Object error) {
+      print(error);
+    });
+
+    return message;
   }
 }
 
