@@ -9,6 +9,8 @@ import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 
+import java.util.Arrays;
+
 import io.flutter.plugin.common.EventChannel;
 
 /**
@@ -27,6 +29,10 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         System.out.println("onReceive");
         if (getResultCode() == Activity.RESULT_OK) {
+            if (intent.getExtras() != null) {
+                System.out.println("format: " + intent.getStringExtra("format"));
+                System.out.println(Arrays.toString(intent.getByteArrayExtra("pdu")));
+            }
             eventSink.success("received");
         }
         else {
