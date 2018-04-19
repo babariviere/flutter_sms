@@ -31,19 +31,25 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
         registrar.addRequestPermissionsResultListener(this);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
+        this.eventSink = eventSink;
         System.out.println("SmsStateHandler.onListen");
         smsStateChangeReceiver = new SmsStateChangeReceiver(eventSink);
         if(permissions.checkAndRequestPermission(
                 new String[]{Manifest.permission.RECEIVE_SMS},
                 Permissions.BROADCAST_SMS)){
             System.out.println("SmsStateHandler.onListen.hasPermissions");
-            registrar.context().registerReceiver(
-                    smsStateChangeReceiver,
-                    new IntentFilter(Telephony.Sms.Intents.SMS_DELIVER_ACTION));
+            registerReceiver();
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void registerReceiver() {
+        System.out.println("registering receiver");
+        registrar.context().registerReceiver(
+                smsStateChangeReceiver,
+                new IntentFilter("SMS_DELIVERED"));
     }
 
     @Override
@@ -66,13 +72,11 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
             }
         }
         if (isOk) {
-            registrar.context().registerReceiver(
-                    smsStateChangeReceiver,
-                    new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
+            registerReceiver();
             return true;
         }
-        eventSink.error("error", "error", "error");
-        eventSink.endOfStream();
+        eventSink.error("#01", "permission denied", null);
+
         return false;
     }
 }
