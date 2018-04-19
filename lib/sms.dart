@@ -24,7 +24,12 @@ class SmsMessage implements Comparable<SmsMessage> {
   SmsMessageKind _kind;
 
   SmsMessage(this._address, this._body,
-      {int id, int threadId, bool read, DateTime date, DateTime dateSent, SmsMessageKind kind}) {
+      {int id,
+      int threadId,
+      bool read,
+      DateTime date,
+      DateTime dateSent,
+      SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
     this._read = read;
@@ -62,7 +67,8 @@ class SmsMessage implements Comparable<SmsMessage> {
       this._date = new DateTime.fromMillisecondsSinceEpoch(data["date"]);
     }
     if (data.containsKey("date_sent")) {
-      this._dateSent = new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+      this._dateSent =
+          new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
   }
 
@@ -270,22 +276,19 @@ class SmsSender {
   Future<SmsMessage> sendSms(SmsMessage msg) async {
     if (msg == null || msg.address == null || msg.body == null) {
       if (msg == null) {
-        throw("no given message");
+        throw ("no given message");
       } else if (msg.address == null) {
-        throw("no given address");
+        throw ("no given address");
       } else if (msg.body == null) {
-        throw("no given body");
+        throw ("no given body");
       }
       return null;
     }
     await _channel.invokeMethod("sendSMS", msg.toMap);
-    return new SmsMessage(
-        msg.address,
-        msg.body,
+    return new SmsMessage(msg.address, msg.body,
         threadId: msg.threadId,
         date: new DateTime.now(),
-        kind: SmsMessageKind.Sent
-    );
+        kind: SmsMessageKind.Sent);
   }
 }
 
@@ -362,11 +365,12 @@ class SmsQuery {
     for (var kind in kinds) {
       result
         ..addAll(await this._querySmsWrapper(
-            start: start,
-            count: count,
-            address: address,
-            threadId: threadId,
-            kind: kind,));
+          start: start,
+          count: count,
+          address: address,
+          threadId: threadId,
+          kind: kind,
+        ));
     }
     if (sort == true) {
       result.sort((a, b) => a.compareTo(b));

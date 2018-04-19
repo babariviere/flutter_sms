@@ -35,7 +35,3 @@ android {
         disable 'InvalidPackage'
     }
 }
-
-dependencies {
-    implementation "com.android.support:support-v4:27.1.0"
-}
