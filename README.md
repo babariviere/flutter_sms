@@ -118,7 +118,7 @@ Uint8List fullSize = await photo.readBytes(fullSize: true);
 ```
 
 **Note**: _the use of `await` keyword means that `readBytes()` is resolved asynchronously
-and a Future is retorned._
+and a Future is returned._
 
 ## User Profile
 
@@ -147,6 +147,27 @@ void main() {
 }
 ```
 
+To be notified when the message is sent and/or delivered, you must add a listener to your message:
+
+```dart
+import 'package:sms/sms.dart';
+
+void main() {
+	SmsSender sender = new SmsSender();
+	String address = getAddress();
+	...
+	SmsMessage message = new SmsMessage(address, 'Hello flutter!');
+	message.addStateListener((state) {
+		if (state == SmsMessageState.Sent) {
+			print("SMS is sent!");
+		} else if (state == SmsMessageState.Delivered) {
+			print("SMS is delivered!");
+		}
+	});
+	sender.sendSms(message);
+}
+```
+
 ## Receiving SMS
 
 If you want to be notified for incoming new messages you must subscribe to an instance of the `SmsReceiver` class:
@@ -164,7 +185,7 @@ void main() {
 
 - [x] SMS Receiver
 - [x] SMS Sender
-- [ ] SMS Delivery
+- [X] SMS Delivery
 - [x] SMS Query
 - [x] SMS Thread
 - [ ] MMS Receiver

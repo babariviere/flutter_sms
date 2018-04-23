@@ -287,8 +287,8 @@ class SmsSender {
 
   factory SmsSender() {
     if (_instance == null) {
-      final MethodChannel methodChannel = const MethodChannel(
-          "plugins.babariviere.com/sendSMS");
+      final MethodChannel methodChannel =
+          const MethodChannel("plugins.babariviere.com/sendSMS");
       _instance = new SmsSender._private(methodChannel);
       methodChannel.setMethodCallHandler(_instance._methodCallHandler);
     }
