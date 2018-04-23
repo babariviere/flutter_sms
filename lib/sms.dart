@@ -6,6 +6,16 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
+/// State of a message
+///
+///
+enum SmsMessageState {
+  Sending,
+  Sent,
+  Delivered,
+  None,
+}
+
 enum SmsMessageKind {
   Sent,
   Received,
@@ -22,6 +32,8 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _date;
   DateTime _dateSent;
   SmsMessageKind _kind;
+  SmsMessageState _state = SmsMessageState.None;
+  Function(int) onStateUpdate;
 
   SmsMessage(this._address, this._body,
       {int id,
@@ -99,6 +111,17 @@ class SmsMessage implements Comparable<SmsMessage> {
     return res;
   }
 
+  addStateListener(Function(int) listener) {
+    this.onStateUpdate = listener;
+  }
+
+  stateUpdate(SmsMessageState state) {
+    this._state = state;
+    if (onStateUpdate != null) {
+
+    }
+  }
+
   /// Get message id
   int get id => this._id;
 
@@ -131,6 +154,9 @@ class SmsMessage implements Comparable<SmsMessage> {
 
   /// Set message date
   set date(DateTime date) => this._date = date;
+
+  /// Get message state
+  get state => this._state;
 
   @override
   int compareTo(SmsMessage other) {
@@ -255,18 +281,18 @@ class SmsReceiver {
 /// A SMS sender
 class SmsSender {
   static SmsSender _instance;
-  final MethodChannel _channel;
+  final MethodChannel _methodChannel;
 
   factory SmsSender() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
-          "plugins.babariviere.com/sendSMS", const JSONMethodCodec());
+          "plugins.babariviere.com/sendSMS");
       _instance = new SmsSender._private(methodChannel);
     }
     return _instance;
   }
 
-  SmsSender._private(this._channel);
+  SmsSender._private(this._methodChannel);
 
   /// Send an SMS
   ///
@@ -289,8 +315,41 @@ class SmsSender {
         threadId: msg.threadId,
         date: new DateTime.now(),
         kind: SmsMessageKind.Sent);
+    msg.addStateListener(SMScallback);
+    Map map = msg.toMap;
+    Function(int) callback = (int i) => print("i");
+    print(callback.toString());
+    String name = _nameOfFunction(callback);
+    print(msg.onStateUpdate.toString());
+    print(_nameOfFunction(msg.onStateUpdate));
+    map["callback"] = _nameOfFunction(msg.onStateUpdate);
+    print(map.toString());
+    await _methodChannel.invokeMethod("sendSMS", map).then((dynamic val) {
+      msg.date = new DateTime.now();
+    });
   }
 }
+
+String _nameOfFunction(Function callback) {
+  if (callback == null) {
+    return '';
+  }
+
+  final String longName = callback.toString();
+  final int functionIndex = longName.indexOf('Function');
+  if (functionIndex == -1) return null;
+  final int openQuote = longName.indexOf("'", functionIndex + 1);
+  if (openQuote == -1) return null;
+  final int closeQuote = longName.indexOf("'", openQuote + 1);
+  if (closeQuote == -1) return null;
+  return longName.substring(openQuote + 1, closeQuote);
+}
+
+SMScallback(int i) {
+  print("Called");
+  print(i);
+}
+
 
 enum SmsQueryKind { Inbox, Sent, Draft }
 
