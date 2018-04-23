@@ -310,7 +310,6 @@ class SmsSender {
       }
       return null;
     }
-        kind: SmsMessageKind.Sent);
     msg.addStateListener(SMScallback);
     Map map = msg.toMap;
     Function(int) callback = (int i) => print("i");
