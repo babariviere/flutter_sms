@@ -7,8 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
 /// State of a message
-///
-///
 enum SmsMessageState {
   Sending,
   Sent,
@@ -16,6 +14,7 @@ enum SmsMessageState {
   None,
 }
 
+/// Kind of message
 enum SmsMessageKind {
   Sent,
   Received,
@@ -23,6 +22,8 @@ enum SmsMessageKind {
 }
 
 /// A SMS Message
+///
+/// Used to send message or used to read message.
 class SmsMessage implements Comparable<SmsMessage> {
   int _id;
   int _threadId;
@@ -111,10 +112,12 @@ class SmsMessage implements Comparable<SmsMessage> {
     return res;
   }
 
+  /// Add a state listener when message is sent or delivered
   addStateListener(Function(SmsMessageState) listener) {
     this.onStateUpdate = listener;
   }
 
+  /// Update state of the message
   stateUpdate(SmsMessageState state) {
     this._state = state;
     if (onStateUpdate != null) {
@@ -295,7 +298,7 @@ class SmsSender {
     return _instance;
   }
 
-  Future<void> _methodCallHandler(MethodCall call) {
+  Future<Null> _methodCallHandler(MethodCall call) {
     int idx = int.parse(call.method);
     SmsMessageState state = SmsMessageState.None;
     if (call.arguments == 1) {
