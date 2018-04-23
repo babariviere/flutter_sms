@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class ContactColor {
   static List<Color> _colors = [
     new Color(0xFFDB4437),
