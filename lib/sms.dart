@@ -310,10 +310,6 @@ class SmsSender {
       }
       return null;
     }
-    await _channel.invokeMethod("sendSMS", msg.toMap);
-    return new SmsMessage(msg.address, msg.body,
-        threadId: msg.threadId,
-        date: new DateTime.now(),
         kind: SmsMessageKind.Sent);
     msg.addStateListener(SMScallback);
     Map map = msg.toMap;
