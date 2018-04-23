@@ -79,10 +79,7 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener, Plugin
     return new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
-        if (getResultCode() == Activity.RESULT_OK) {
-          Log.d("DEBUG", "Calling " + callbackName);
           channel.invokeMethod(callbackName, 1);
-        }
       }
     };
   }
@@ -92,8 +89,6 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener, Plugin
       @Override
       public void onReceive(Context context, Intent intent) {
         if (getResultCode() == Activity.RESULT_OK) {
-          Log.d("DEBUG", "Calling " + callbackName);
-          Log.d("CHANNEL", channel.toString());
           channel.invokeMethod(callbackName, 2);
         }
       }
@@ -148,7 +143,6 @@ class SmsSender implements MethodCallHandler {
   @Override
   public void onMethodCall(MethodCall call, MethodChannel.Result result) {
     if (call.method.equals("sendSMS")) {
-      Log.d("DEBUG", call.arguments.toString());
       String address = call.argument("address");
       String body = call.argument("body");
       String callback = call.argument("callback");
