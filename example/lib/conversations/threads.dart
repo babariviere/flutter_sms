@@ -16,6 +16,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
   final SmsQuery _query = new SmsQuery();
   final SmsReceiver _receiver = new SmsReceiver();
   final UserProfileProvider _userProfileProvider = new UserProfileProvider();
+  final SmsSender _smsSender = new SmsSender();
 
   // Animation
   AnimationController opacityController;
@@ -26,6 +27,7 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
     _receiver.onSmsReceived.listen(_onSmsReceived);
     _userProfileProvider.getUserProfile().then(_onUserProfileLoaded);
     _query.getAllThreads.then(_onThreadsLoaded);
+    _smsSender.onSmsDelivered.listen(_onSmsDelivered);
 
     // Animation
     opacityController = new AnimationController(
@@ -101,5 +103,10 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
         opacityController.animateTo(1.0, curve: Curves.easeIn);
       });
     }
+  }
+
+  void _onSmsDelivered(SmsMessage sms) {
+    final snackBar = new SnackBar(content: new Text('Message to: ${sms.address} delivered'));
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }

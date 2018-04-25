@@ -30,8 +30,8 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _dateSent;
   SmsMessageKind _kind;
   SmsMessageState _state = SmsMessageState.None;
-  int _otherId = 0;
-  static int _currentVal = 0;
+  StreamController<SmsMessageState> _stateStreamController =
+      new StreamController<SmsMessageState>();
 
   SmsMessage(this._address, this._body,
       {int id,
@@ -46,8 +46,6 @@ class SmsMessage implements Comparable<SmsMessage> {
     this._date = date;
     this._dateSent = dateSent;
     this._kind = kind;
-
-    _otherId = _currentVal++;
   }
 
   /// Read message fron JSON
@@ -82,8 +80,6 @@ class SmsMessage implements Comparable<SmsMessage> {
       this._dateSent =
           new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
-
-    _otherId = _currentVal++;
   }
 
   /// Convert SMS to map
@@ -140,6 +136,8 @@ class SmsMessage implements Comparable<SmsMessage> {
   /// Get message kind
   SmsMessageKind get kind => this._kind;
 
+  Stream<SmsMessageState> get onStateChanged => _stateStreamController.stream;
+
   /// Set message kind
   set kind(SmsMessageKind kind) => this._kind = kind;
 
@@ -147,8 +145,10 @@ class SmsMessage implements Comparable<SmsMessage> {
   set date(DateTime date) => this._date = date;
 
   set state(SmsMessageState state) {
-    this._state = state;
-    print("state for: " + _otherId.toString() + " is " + state.toString());
+    if (this._state != state) {
+      this._state = state;
+      _stateStreamController.add(state);
+    }
   }
 
   @override
@@ -276,15 +276,16 @@ class SmsSender {
   static SmsSender _instance;
   final MethodChannel _channel;
   final EventChannel _stateChannel;
-  Stream<dynamic> _onSmsStatusChange;
+  Map<int, SmsMessage> _sentMessages;
+  int _sentId = 0;
+  final StreamController<SmsMessage> _deliveredStreamController = new StreamController<SmsMessage>();
 
   factory SmsSender() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
           "plugins.babariviere.com/sendSMS", const JSONMethodCodec());
-
       final EventChannel stateChannel = const EventChannel(
-          "plugins.babariviere.com/statusSMS");
+          "plugins.babariviere.com/statusSMS", const JSONMethodCodec());
 
       _instance = new SmsSender._private(methodChannel, stateChannel);
     }
@@ -292,7 +293,12 @@ class SmsSender {
   }
 
   SmsSender._private(this._channel, this._stateChannel) {
-    _onSmsStatusChange = _stateChannel.receiveBroadcastStream();
+    _stateChannel.receiveBroadcastStream().listen(this._onSmsStateChanged,
+        onError: (Object error) {
+      print(error);
+    });
+
+    _sentMessages = new Map<int, SmsMessage>();
   }
 
   /// Send an SMS
@@ -311,29 +317,34 @@ class SmsSender {
       }
       return null;
     }
-    await _channel.invokeMethod("sendSMS", msg.toMap);
-    SmsMessage message = new SmsMessage(
-        msg.address,
-        msg.body,
-        threadId: msg.threadId,
-        date: new DateTime.now(),
-        kind: SmsMessageKind.Sent
-    );
 
-    _onSmsStatusChange.listen((Object state){
-      switch(state.toString()){
+    Map map = msg.toMap;
+    this._sentMessages.putIfAbsent(this._sentId, () => msg);
+    map['sentId'] = this._sentId;
+    this._sentId += 1;
+
+    await _channel.invokeMethod("sendSMS", map);
+    msg.date = new DateTime.now();
+
+    return msg;
+  }
+
+  Stream<SmsMessage> get onSmsDelivered => _deliveredStreamController.stream;
+
+  void _onSmsStateChanged(dynamic stateChange) {
+    int id = int.parse(stateChange['sentId']);
+    if (_sentMessages.containsKey(id)) {
+      switch (stateChange['state']) {
         case 'sent':
-          message.state = SmsMessageState.Sent;
+          _sentMessages[id].state = SmsMessageState.Sent;
           break;
         case 'delivered':
-          message.state = SmsMessageState.Delivered;
+          _sentMessages[id].state = SmsMessageState.Delivered;
+          _deliveredStreamController.add(_sentMessages[id]);
+          _sentMessages.remove(id);
           break;
       }
-    }, onError: (Object error) {
-      print(error);
-    });
-
-    return message;
+    }
   }
 }
 
