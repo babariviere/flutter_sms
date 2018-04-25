@@ -9,6 +9,9 @@ import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 
 import io.flutter.plugin.common.EventChannel;
@@ -27,29 +30,32 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("onReceive");
         if (getResultCode() == Activity.RESULT_OK) {
-            if (intent.getExtras() != null) {
-                System.out.println("format: " + intent.getStringExtra("format"));
-                System.out.println(Arrays.toString(intent.getByteArrayExtra("pdu")));
-                System.out.println(intent.getAction());
-                System.out.println(intent.getDataString());
-            }
+            //SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
+            try {
+                JSONObject stateChange = new JSONObject();
+                stateChange.put("sentId", intent.getStringExtra("sentId"));
+                String action = intent.getAction();
 
-            String action = intent.getAction();
-            switch (action != null ? action : "none") {
-                case "SMS_SENT":
-                    eventSink.success("sent");
-                    break;
-                case "SMS_DELIVERED":
-                    eventSink.success("delivered");
-                    break;
-                default:
-                    eventSink.success("none");
+                switch (action != null ? action : "none") {
+                    case "SMS_SENT":
+                        stateChange.put("state", "sent");
+                        break;
+                    case "SMS_DELIVERED":
+                        stateChange.put("state", "delivered");
+                        break;
+                    default:
+                        stateChange.put("state", "none");
+                }
+
+                eventSink.success(stateChange);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                eventSink.error("#01", e.getMessage(), null);
             }
-        }
-        else {
-            eventSink.error("bad", "bad", "bad");
+        } else {
+            eventSink.error("#01", "message state change error", null);
         }
     }
 }

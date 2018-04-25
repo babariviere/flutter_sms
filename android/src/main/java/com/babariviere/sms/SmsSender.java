@@ -33,13 +33,15 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
     private MethodChannel.Result result;
     private String address;
     private String body;
+    private int sentId;
     private final Registrar registrar;
 
-    SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, String address, String body) {
+    SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, String address, String body, int sentId) {
+        this.registrar = registrar;
         this.result = result;
         this.address = address;
         this.body = body;
-        this.registrar = registrar;
+        this.sentId = sentId;
     }
 
     void handle(Permissions permissions) {
@@ -71,21 +73,25 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void sendSmsMessage() {
 
-        PendingIntent sentIntent = PendingIntent.getBroadcast(
+        Intent sentIntent = new Intent("SMS_SENT");
+        sentIntent.putExtra("sentId", sentId);
+        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(
                 registrar.context(),
                 0,
-                new Intent("SMS_SENT"),
+                sentIntent,
                 0
         );
 
-        PendingIntent deliveredIntent = PendingIntent.getBroadcast(
+        Intent deliveredIntent = new Intent("SMS_DELIVERED");
+        sentIntent.putExtra("sentId", sentId);
+        PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(
                 registrar.context(),
                 0,
-                new Intent("SMS_DELIVERED"),
+                deliveredIntent,
                 0
         );
 
-        sms.sendTextMessage(address, null, body, sentIntent, deliveredIntent);
+        sms.sendTextMessage(address, null, body, sentPendingIntent, deliveredPendingIntent);
         result.success(null);
     }
 }
@@ -105,12 +111,13 @@ class SmsSender implements MethodCallHandler {
         if (call.method.equals("sendSMS")) {
             String address = call.argument("address");
             String body = call.argument("body");
+            int sentId = Integer.parseInt(call.argument("sentId"));
             if (address == null) {
                 result.error("#02", "missing argument 'address'", null);
             } else if (body == null) {
                 result.error("#02", "missing argument 'body'", null);
             } else {
-                SmsSenderMethodHandler handler = new SmsSenderMethodHandler(registrar, result, address, body);
+                SmsSenderMethodHandler handler = new SmsSenderMethodHandler(registrar, result, address, body, sentId);
                 this.registrar.addRequestPermissionsResultListener(handler);
                 handler.handle(this.permissions);
             }
