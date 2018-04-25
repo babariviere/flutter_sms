@@ -33,7 +33,7 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime _dateSent;
   SmsMessageKind _kind;
   SmsMessageState _state = SmsMessageState.None;
-  Function(SmsMessageState) onStateUpdate;
+  Function(SmsMessageState) _onStateUpdate;
 
   SmsMessage(this._address, this._body,
       {int id,
@@ -112,13 +112,13 @@ class SmsMessage implements Comparable<SmsMessage> {
   }
 
   addStateListener(Function(SmsMessageState) listener) {
-    this.onStateUpdate = listener;
+    this._onStateUpdate = listener;
   }
 
   stateUpdate(SmsMessageState state) {
     this._state = state;
-    if (onStateUpdate != null) {
-      onStateUpdate(state);
+    if (_onStateUpdate != null) {
+      _onStateUpdate(state);
     }
   }
 
@@ -283,7 +283,7 @@ class SmsSender {
   static SmsSender _instance;
   final MethodChannel _methodChannel;
   int id = 0;
-  Map<int, Function(SmsMessageState)> _callbacks;
+  Map<int, SmsMessage> _sentMessages;
 
   factory SmsSender() {
     if (_instance == null) {
@@ -296,23 +296,24 @@ class SmsSender {
   }
 
   Future<void> _methodCallHandler(MethodCall call) {
-    int idx = int.parse(call.method);
     SmsMessageState state = SmsMessageState.None;
-    if (call.arguments == 1) {
+    int id = int.parse(call.arguments['sentId']);
+    int newState = int.parse(call.arguments['state']);
+    if (newState == 1) {
       state = SmsMessageState.Sent;
-    } else if (call.arguments == 2) {
+    } else if (newState == 2) {
       state = SmsMessageState.Delivered;
     }
     if (state != SmsMessageState.None) {
-      this._callbacks[idx](state);
+      this._sentMessages[id].stateUpdate(state);
       if (state == SmsMessageState.Delivered) {
         // Clean memory
-        this._callbacks.remove(idx);
+        this._sentMessages.remove(id);
       }
     }
   }
 
-  SmsSender._private(this._methodChannel) : _callbacks = new Map();
+  SmsSender._private(this._methodChannel) : _sentMessages = new Map();
 
   /// Send an SMS
   ///
@@ -331,16 +332,15 @@ class SmsSender {
       return null;
     }
     Map map = msg.toMap;
-    if (msg.onStateUpdate != null) {
-      int id = this.id;
-      this._callbacks.putIfAbsent(id, () => msg.onStateUpdate);
-      this.id += 1;
-      map["callback"] = id.toString();
-    }
+    this._sentMessages.putIfAbsent(id, () => msg);
+    map["sentId"] = id.toString();
+    this.id += 1;
 
     await _methodChannel.invokeMethod("sendSMS", map).then((dynamic val) {
       msg.date = new DateTime.now();
     });
+
+    return msg;
   }
 }
 
