@@ -11,9 +11,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import com.babariviere.sms.permisions.Permissions;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -36,15 +38,15 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener, Plugin
   private MethodChannel channel;
   private String address;
   private String body;
-  private String callbackName;
+  private String sentId;
 
-  SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, MethodChannel channel, String address, String body, String callbackName) {
+  SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, MethodChannel channel, String address, String body, String sentId) {
     this.registrar = registrar;
     this.result = result;
     this.channel = channel;
     this.address = address;
     this.body = body;
-    this.callbackName = callbackName;
+    this.sentId = sentId;
   }
 
   void handle(Permissions permissions) {
@@ -58,38 +60,52 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener, Plugin
     String DELIVERED = "SMS_DELIVERED";
     PendingIntent sentPI = null;
     PendingIntent deliveryPI = null;
-    if (callbackName != null) {
+    if (sentId != null) {
       Intent sentIntent = new Intent(SENT);
-      sentIntent.putExtra("callback", this.callbackName);
+      sentIntent.putExtra("callback", this.sentId);
       sentIntent.putExtra("value", 1);
       Intent deliveryIntent = new Intent(DELIVERED);
-      deliveryIntent.putExtra("callback", this.callbackName);
+      deliveryIntent.putExtra("callback", this.sentId);
       deliveryIntent.putExtra("value", 2);
       sentPI = PendingIntent.getBroadcast(this.registrar.context(), 0, sentIntent, 0);
       deliveryPI = PendingIntent.getBroadcast(this.registrar.context(), 0, deliveryIntent, 0);
-      this.registrar.context().registerReceiver(getSentReceiver(this.channel, this.callbackName), new IntentFilter(SENT));
-      this.registrar.context().registerReceiver(getDeliveredReceiver(this.channel, this.callbackName), new IntentFilter(DELIVERED));
+      this.registrar.context().registerReceiver(getSentReceiver(this.channel, this.sentId), new IntentFilter(SENT));
+      this.registrar.context().registerReceiver(getDeliveredReceiver(this.channel, this.sentId), new IntentFilter(DELIVERED));
       this.registrar.addNewIntentListener(this);
     }
     sms.sendTextMessage(address, null, body, sentPI, deliveryPI);
     result.success(null);
   }
 
-  private BroadcastReceiver getSentReceiver(final MethodChannel channel, final String callbackName) {
+  private BroadcastReceiver getSentReceiver(final MethodChannel channel, final String sentId) {
     return new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
-          channel.invokeMethod(callbackName, 1);
+        try {
+          JSONObject obj = new JSONObject();
+          obj.put("sentId", sentId);
+          obj.put("state", 1);
+          channel.invokeMethod("updateState", obj);
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
       }
     };
   }
 
-  private BroadcastReceiver getDeliveredReceiver(final MethodChannel channel, final String callbackName) {
+  private BroadcastReceiver getDeliveredReceiver(final MethodChannel channel, final String sentId) {
     return new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
         if (getResultCode() == Activity.RESULT_OK) {
-          channel.invokeMethod(callbackName, 2);
+          try {
+            JSONObject obj = new JSONObject();
+            obj.put("sentId", sentId);
+            obj.put("state", 2);
+            channel.invokeMethod("updateState", obj);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         }
       }
     };
@@ -154,7 +170,6 @@ class SmsSender implements MethodCallHandler {
         SmsSenderMethodHandler handler = new SmsSenderMethodHandler(registrar, result, channel, address, body, callback);
         this.registrar.addRequestPermissionsResultListener(handler);
         handler.handle(this.permissions);
-
       }
     } else {
       result.notImplemented();
