@@ -15,6 +15,8 @@ import com.babariviere.sms.permisions.Permissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -86,9 +88,9 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
         deliveredIntent.putExtra("sentId", sentId);
         PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(
                 registrar.context(),
-                0,
+                UUID.randomUUID().hashCode(),
                 deliveredIntent,
-                0
+                PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         sms.sendTextMessage(address, null, body, sentPendingIntent, deliveredPendingIntent);
