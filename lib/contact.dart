@@ -175,7 +175,7 @@ class ContactQuery {
 class UserProfile {
   String _fullName;
   Photo _photo;
-  List<String> _addresses;
+  List<String> _addresses = new List<String>();
 
   UserProfile();
 
@@ -188,8 +188,9 @@ class UserProfile {
           new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
     if (data.containsKey("addresses")) {
-      _addresses = new List<String>();
-      _addresses.addAll(data["addresses"]);
+      for (final address in data["addresses"]) {
+        _addresses.add(address);
+      }
     }
   }
 

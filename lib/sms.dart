@@ -295,7 +295,7 @@ class SmsSender {
   SmsSender._private(this._channel, this._stateChannel) {
     _stateChannel.receiveBroadcastStream().listen(this._onSmsStateChanged,
         onError: (Object error) {
-      print(error);
+      print('Error from Platform: ' + error);
     });
 
     _sentMessages = new Map<int, SmsMessage>();
@@ -332,17 +332,25 @@ class SmsSender {
   Stream<SmsMessage> get onSmsDelivered => _deliveredStreamController.stream;
 
   void _onSmsStateChanged(dynamic stateChange) {
-    int id = int.parse(stateChange['sentId']);
+    print('state changed:' + stateChange['state'] + '-state');
+    int id = stateChange['sentId'];
+    print('id is:');
+    print(id);
+    print('contains key:');
+    print(_sentMessages.containsKey(id));
     if (_sentMessages.containsKey(id)) {
       switch (stateChange['state']) {
-        case 'sent':
+        case 'sent': {
           _sentMessages[id].state = SmsMessageState.Sent;
           break;
-        case 'delivered':
+        }
+        case 'delivered': {
+          print('message was delivered');
           _sentMessages[id].state = SmsMessageState.Delivered;
           _deliveredStreamController.add(_sentMessages[id]);
           _sentMessages.remove(id);
           break;
+        }
       }
     }
   }
