@@ -83,7 +83,7 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
         );
 
         Intent deliveredIntent = new Intent("SMS_DELIVERED");
-        sentIntent.putExtra("sentId", sentId);
+        deliveredIntent.putExtra("sentId", sentId);
         PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(
                 registrar.context(),
                 0,
@@ -109,9 +109,9 @@ class SmsSender implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
         if (call.method.equals("sendSMS")) {
-            String address = call.argument("address");
-            String body = call.argument("body");
-            int sentId = Integer.parseInt(call.argument("sentId"));
+            String address = call.argument("address").toString();
+            String body = call.argument("body").toString();
+            int sentId = call.argument("sentId");
             if (address == null) {
                 result.error("#02", "missing argument 'address'", null);
             } else if (body == null) {
