@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 
 typedef void MessageSentCallback(SmsMessage message);
@@ -43,15 +45,21 @@ class FormSend extends StatelessWidget {
 
   void _sendMessage(BuildContext context) async {
     SmsMessage message = new SmsMessage(thread.address, _textFieldController.text, threadId: thread.id);
-    message.onStateChanged.listen((SmsMessageState state){
+    message.onStateChanged.listen((SmsMessageState state) async {
       if (state == SmsMessageState.Delivered) {
-        final snackBar = new SnackBar(content: new Text('Message to: ${message.address} delivered'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        _showDeliveredNotification(message, context);
       }
     });
 
     await _sender.sendSms(message);
     _textFieldController.clear();
     onMessageSent(message);
+  }
+
+  void _showDeliveredNotification(SmsMessage message, BuildContext context) async {
+    final contacts = new ContactQuery();
+    Contact contact = await contacts.queryContact(message.address);
+    final snackBar = new SnackBar(content: new Text('Message to ${contact.fullName} delivered'));
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }

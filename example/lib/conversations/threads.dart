@@ -105,8 +105,10 @@ class _ThreadsState extends State<Threads> with TickerProviderStateMixin {
     }
   }
 
-  void _onSmsDelivered(SmsMessage sms) {
-    final snackBar = new SnackBar(content: new Text('Message to: ${sms.address} delivered'));
+  void _onSmsDelivered(SmsMessage sms) async {
+    final contacts = new ContactQuery();
+    Contact contact = await contacts.queryContact(sms.address);
+    final snackBar = new SnackBar(content: new Text('Message to ${contact.fullName} delivered'));
     Scaffold.of(context).showSnackBar(snackBar);
   }
 }
