@@ -318,6 +318,7 @@ class SmsSender {
       return null;
     }
 
+    msg.state = SmsMessageState.Sending;
     Map map = msg.toMap;
     this._sentMessages.putIfAbsent(this._sentId, () => msg);
     map['sentId'] = this._sentId;
