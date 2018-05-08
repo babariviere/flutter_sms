@@ -100,7 +100,7 @@ import 'package:sms/contact.dart';
 
 void main() {
   ContactQuery contacts = new ContactQuery();
-  Contact contact = await contacts.queryContact(getAddress());
+  Contact contact = await contacts.queryContact(someAddress());
   print(contact.fullName);
 }
 String getAddress() {...}
@@ -141,11 +141,45 @@ import 'package:sms/sms.dart';
 
 void main() {
   SmsSender sender = new SmsSender();
-  String address = getAddress();
+  String address = someAddress(); 
   ...
   sender.sendSms(new SmsMessage(address, 'Hello flutter!'));
 }
 ```
+
+To be notified when the message is sent and/or delivered, you must add a listener to your message:
+
+```dart
+import 'package:sms/sms.dart';
+
+void main() {
+	SmsSender sender = new SmsSender();
+	String address = someAddress();
+	...
+	SmsMessage message = new SmsMessage(address, 'Hello flutter!');
+	message.onStateChanged.listen((state) {
+		if (state == SmsMessageState.Sent) {
+			print("SMS is sent!");
+		} else if (state == SmsMessageState.Delivered) {
+			print("SMS is delivered!");
+		}
+	});
+	sender.sendSms(message);
+}
+```
+Some times it is usefull to be notified of delivered messages regardless of the message. To do that you must subscribe to the `onSmsDelivered` of the `SmsSender` class instance:
+
+```dart
+void main() {
+...
+SmsSender sender = new SmsSender();
+sender.onSmsDelivered.listen((SmsMessage message){
+  print('${message.address} received your message.');
+}));
+}
+```
+
+**Note**: Using the `onSmsDelivered` from the `SmsSender` will only notify to listeners of messages that has been sent through `SmsSender.send()`.
 
 ## Receiving SMS
 
@@ -164,7 +198,7 @@ void main() {
 
 - [x] SMS Receiver
 - [x] SMS Sender
-- [ ] SMS Delivery
+- [x] SMS Delivery
 - [x] SMS Query
 - [x] SMS Thread
 - [ ] MMS Receiver
