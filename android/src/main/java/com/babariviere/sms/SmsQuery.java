@@ -41,58 +41,29 @@ enum SmsQueryRequest {
   }
 }
 
-class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
+class SmsQueryHandler implements RequestPermissionsResultListener {
   private final PluginRegistry.Registrar registrar;
-  private final Permissions permissions;
   private final String[] permissionsList = new String[]{Manifest.permission.READ_SMS};
   private MethodChannel.Result result;
-
   private SmsQueryRequest request;
   private int start = 0;
   private int count = -1;
   private int threadId = -1;
   private String address = null;
 
-  SmsQuery(PluginRegistry.Registrar registrar) {
+  SmsQueryHandler(PluginRegistry.Registrar registrar, MethodChannel.Result result, SmsQueryRequest request,
+                  int start, int count, int threadId, String address) {
     this.registrar = registrar;
-    this.permissions = new Permissions(registrar.activity());
-    registrar.addRequestPermissionsResultListener(this);
+    this.result = result;
+    this.request = request;
+    this.start = start;
+    this.count = count;
+    this.threadId = threadId;
+    this.address = address;
   }
 
-  @Override
-  public void onMethodCall(MethodCall call, Result result) {
-    this.result = result;
-    start = 0;
-    count = -1;
-    threadId = -1;
-    address = null;
-    switch (call.method) {
-      case "getInbox":
-        request = SmsQueryRequest.Inbox;
-        break;
-      case "getSent":
-        request = SmsQueryRequest.Sent;
-        break;
-      case "getDraft":
-        request = SmsQueryRequest.Draft;
-        break;
-      default:
-        result.notImplemented();
-        return;
-    }
-    if (call.hasArgument("start")) {
-      start = call.argument("start");
-    }
-    if (call.hasArgument("count")) {
-      count = call.argument("count");
-    }
-    if (call.hasArgument("thread_id")) {
-      threadId = call.argument("thread_id");
-    }
-    if (call.hasArgument("address")) {
-      address = call.argument("address");
-    }
-    if (permissions.checkAndRequestPermission(permissionsList, Permissions.READ_SMS_ID_REQ)) {
+  void handle(Permissions permissions) {
+    if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
       querySms();
     }
   }
@@ -173,4 +144,54 @@ class SmsQuery implements MethodCallHandler, RequestPermissionsResultListener {
     result.error("#01", "permission denied", null);
     return false;
   }
+}
+
+class SmsQuery implements MethodCallHandler {
+  private final PluginRegistry.Registrar registrar;
+  private final Permissions permissions;
+
+
+  SmsQuery(PluginRegistry.Registrar registrar) {
+    this.registrar = registrar;
+    this.permissions = new Permissions(registrar.activity());
+  }
+
+  @Override
+  public void onMethodCall(MethodCall call, Result result) {
+    int start = 0;
+    int count = -1;
+    int threadId = -1;
+    String address = null;
+    SmsQueryRequest request;
+    switch (call.method) {
+      case "getInbox":
+        request = SmsQueryRequest.Inbox;
+        break;
+      case "getSent":
+        request = SmsQueryRequest.Sent;
+        break;
+      case "getDraft":
+        request = SmsQueryRequest.Draft;
+        break;
+      default:
+        result.notImplemented();
+        return;
+    }
+    if (call.hasArgument("start")) {
+      start = call.argument("start");
+    }
+    if (call.hasArgument("count")) {
+      count = call.argument("count");
+    }
+    if (call.hasArgument("thread_id")) {
+      threadId = call.argument("thread_id");
+    }
+    if (call.hasArgument("address")) {
+      address = call.argument("address");
+    }
+    SmsQueryHandler handler = new SmsQueryHandler(registrar, result, request, start, count, threadId, address);
+    this.registrar.addRequestPermissionsResultListener(handler);
+    handler.handle(permissions);
+  }
+
 }

@@ -187,9 +187,7 @@ class UserProfile {
           new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
     }
     if (data.containsKey("addresses")) {
-      for (final address in data["addresses"]) {
-        _addresses.add(address);
-      }
+      _addresses = List.from(data["addresses"]);
     }
   }
 

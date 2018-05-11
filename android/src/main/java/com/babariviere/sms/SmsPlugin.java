@@ -5,9 +5,9 @@ import com.babariviere.sms.status.SmsStateHandler;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
-import io.flutter.plugin.common.StandardMethodCodec;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.plugin.common.StandardMethodCodec;
 
 /**
  * SmsPlugin

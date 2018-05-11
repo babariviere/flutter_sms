@@ -118,7 +118,7 @@ Uint8List fullSize = await photo.readBytes(fullSize: true);
 ```
 
 **Note**: _the use of `await` keyword means that `readBytes()` is resolved asynchronously
-and a Future is retorned._
+and a Future is returned._
 
 ## User Profile
 
@@ -141,7 +141,7 @@ import 'package:sms/sms.dart';
 
 void main() {
   SmsSender sender = new SmsSender();
-  String address = someAddress(); 
+  String address = someAddress();
   ...
   sender.sendSms(new SmsMessage(address, 'Hello flutter!'));
 }
