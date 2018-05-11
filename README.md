@@ -167,7 +167,7 @@ void main() {
   sender.sendSms(message);
 }
 ```
-Some times it is usefull to be notified of delivered messages regardless of the message. To do that you must subscribe to the `onSmsDelivered` of the `SmsSender` class instance:
+Some times it is useful to be notified of delivered messages regardless of the message. To do that you must subscribe to the `onSmsDelivered` of the `SmsSender` class instance:
 
 ```dart
 void main() {
