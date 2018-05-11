@@ -44,9 +44,13 @@ class FormSend extends StatelessWidget {
 
   void _sendMessage(BuildContext context) async {
     SmsMessage message = new SmsMessage(thread.address, _textFieldController.text, threadId: thread.id);
-    message.onStateChanged.listen((SmsMessageState state) async {
+    message.onStateChanged.listen((SmsMessageState state) {
       if (state == SmsMessageState.Delivered) {
+        print('Message delivered to ${message.address}');
         _showDeliveredNotification(message, context);
+      }
+      if (state == SmsMessageState.Sent) {
+        print('Message sent to ${message.address}');
       }
     });
 

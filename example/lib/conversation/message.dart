@@ -11,11 +11,11 @@ class Message extends StatelessWidget {
 
   final SmsMessage message;
 
-  bool get sent => message.kind == SmsMessageKind.Sent;
+  bool get sent => message.kind == SmsMessageKind.Sent || message.state == SmsMessageState.Sent || message.state == SmsMessageState.Sending || message.state == SmsMessageState.Delivered;
 
   @override
   Widget build(BuildContext context) {
-    return sent ? _buildSentWidget(context) : _buildReceivedWidget(context);
+    return this.sent ? _buildSentWidget(context) : _buildReceivedWidget(context);
   }
 
   Widget _buildSentWidget(BuildContext context) {
