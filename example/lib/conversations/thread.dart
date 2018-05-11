@@ -31,7 +31,7 @@ class Thread extends StatelessWidget {
   }
 
   void _showConversation(BuildContext context) {
-    Navigator.of(context).push(
-        new MaterialPageRoute(builder: (context) => new Conversation(thread, userProfile)));
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (context) => new Conversation(thread, userProfile)));
   }
 }

@@ -1,3 +1,7 @@
+## [0.1.0] - 2018-04-23
+
+* Sms Delivery
+
 ## [0.0.10] - 2018-04-18
 
 * Automatically assign contact to created SmsThread

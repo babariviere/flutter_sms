@@ -20,6 +20,8 @@ enum SmsMessageKind {
 }
 
 /// A SMS Message
+///
+/// Used to send message or used to read message.
 class SmsMessage implements Comparable<SmsMessage> {
   int _id;
   int _threadId;
@@ -143,6 +145,9 @@ class SmsMessage implements Comparable<SmsMessage> {
 
   /// Set message date
   set date(DateTime date) => this._date = date;
+
+  /// Get message state
+  get state => this._state;
 
   set state(SmsMessageState state) {
     if (this._state != state) {
