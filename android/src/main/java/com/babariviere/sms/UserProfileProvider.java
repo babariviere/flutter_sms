@@ -54,7 +54,7 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private JSONObject getProfileObject() {
-        JSONObject obj = new JSONObject();
+        JSONObject obj = null;
 
         String[] projection = new String[]{
                 ContactsContract.Profile._ID,
@@ -66,6 +66,7 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
         Cursor cursor = getContentResolver().query(ContactsContract.Profile.CONTENT_URI, projection, null, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
+                obj = new JSONObject();
                 try {
                     obj.put("id", cursor.getString(0));
                     obj.put("name", cursor.getString(1));
@@ -76,8 +77,6 @@ class UserProfileHandler implements PluginRegistry.RequestPermissionsResultListe
                 }
             }
             cursor.close();
-        } else {
-            return null;
         }
 
         return obj;

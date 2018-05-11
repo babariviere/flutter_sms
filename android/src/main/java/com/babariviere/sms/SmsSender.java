@@ -81,7 +81,7 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
                 registrar.context(),
                 0,
                 sentIntent,
-                0
+                PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         Intent deliveredIntent = new Intent("SMS_DELIVERED");

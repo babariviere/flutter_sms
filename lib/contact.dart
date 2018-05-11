@@ -215,7 +215,10 @@ class UserProfileProvider {
 
   Future<UserProfile> getUserProfile() async {
     return await _channel.invokeMethod("getUserProfile").then((dynamic val) {
-      return new UserProfile._fromJson(val);
+      if (val == null)
+        return new UserProfile();
+      else
+        return new UserProfile._fromJson(val);
     });
   }
 }
