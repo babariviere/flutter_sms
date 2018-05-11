@@ -34,19 +34,8 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
             //SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
             try {
                 JSONObject stateChange = new JSONObject();
-
-                System.out.println("extras are:");
-                System.out.println(Arrays.toString(intent.getExtras().keySet().toArray()));
-
                 stateChange.put("sentId", intent.getIntExtra("sentId", -1));
                 String action = intent.getAction();
-
-
-                System.out.println("action is:");
-                System.out.println(action);
-
-                System.out.println("id is:");
-                System.out.println(intent.getIntExtra("sentId", -1));
 
                 switch (action != null ? action : "none") {
                     case "SMS_SENT": {

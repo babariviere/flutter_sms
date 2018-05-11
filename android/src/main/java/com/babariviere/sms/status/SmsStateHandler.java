@@ -32,12 +32,10 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
         this.eventSink = eventSink;
-        System.out.println("SmsStateHandler.onListen");
         smsStateChangeReceiver = new SmsStateChangeReceiver(eventSink);
         if(permissions.checkAndRequestPermission(
                 new String[]{Manifest.permission.RECEIVE_SMS},
                 Permissions.BROADCAST_SMS)){
-            System.out.println("SmsStateHandler.onListen.hasPermissions");
             registerDeliveredReceiver();
             registerSentReceiver();
         }
@@ -45,7 +43,6 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void registerDeliveredReceiver() {
-        System.out.println("registering delivered receiver");
         registrar.context().registerReceiver(
                 smsStateChangeReceiver,
                 new IntentFilter("SMS_DELIVERED"));
@@ -53,7 +50,6 @@ public class SmsStateHandler implements EventChannel.StreamHandler, PluginRegist
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void registerSentReceiver() {
-        System.out.println("registering sent receiver");
         registrar.context().registerReceiver(
                 smsStateChangeReceiver,
                 new IntentFilter("SMS_SENT"));
