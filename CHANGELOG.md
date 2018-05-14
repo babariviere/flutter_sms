@@ -1,3 +1,8 @@
+## [0.1.1] - 2018-05-14
+
+* Sms Delivery using streams and event channels
+* Fixed minnor errors in channels
+
 ## [0.1.0] - 2018-04-23
 
 * Sms Delivery
