@@ -178,7 +178,14 @@ class SmsThread {
       return;
     }
     this._id = messages[0].threadId;
-    this._address = messages[0].address;
+
+    for (var msg in messages) {
+      if (msg.threadId == _id && msg.address != null) {
+        this._address = msg.address;
+        break;
+      }
+    }
+
     for (var msg in messages) {
       if (msg.threadId == _id) {
         this._messages.add(msg);
@@ -447,8 +454,8 @@ class SmsQuery {
       {List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox]}) async {
     List<SmsThread> threads = <SmsThread>[];
     for (var id in threadsId) {
-      final thread = new SmsThread(id);
-      thread.messages = await this.querySms(threadId: id, kinds: kinds);
+      final messages = await this.querySms(threadId: id, kinds: kinds);
+      final thread = new SmsThread.fromMessages(messages);
       await thread.findContact();
       threads.add(thread);
     }
