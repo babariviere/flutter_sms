@@ -3,6 +3,7 @@
 * Sms Delivery with Dart Streams and Event Channels
 * Fixed some minor errors
 * Fixed error on User Profile. The method 'getUserProfile()' will always return an instance of UserProfile even when no user profile configured in phone.
+* Fixed error in SmsThread.findContact when first message is a draft.
 
 ## [0.1.0] - 2018-04-23
 
