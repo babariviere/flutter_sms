@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 
 typedef void MessageSentCallback(SmsMessage message);
 
 class FormSend extends StatelessWidget {
   final SmsThread thread;
-  final TextEditingController _textFieldController =
-      new TextEditingController();
+  final TextEditingController _textFieldController = new TextEditingController();
   final SmsSender _sender = new SmsSender();
 
   final MessageSentCallback onMessageSent;
@@ -34,7 +34,7 @@ class FormSend extends StatelessWidget {
           ),
           new IconButton(
             icon: new Icon(Icons.send),
-            onPressed: _sendMessage,
+            onPressed: () { _sendMessage(context); },
             color: Colors.blue,
           )
         ],
@@ -42,11 +42,27 @@ class FormSend extends StatelessWidget {
     );
   }
 
-  void _sendMessage() async {
-    final message = await _sender.sendSms(new SmsMessage(
-        thread.address, _textFieldController.text,
-        threadId: thread.id));
+  void _sendMessage(BuildContext context) async {
+    SmsMessage message = new SmsMessage(thread.address, _textFieldController.text, threadId: thread.id);
+    message.onStateChanged.listen((SmsMessageState state) {
+      if (state == SmsMessageState.Delivered) {
+        print('Message delivered to ${message.address}');
+        _showDeliveredNotification(message, context);
+      }
+      if (state == SmsMessageState.Sent) {
+        print('Message sent to ${message.address}');
+      }
+    });
+
+    await _sender.sendSms(message);
     _textFieldController.clear();
     onMessageSent(message);
+  }
+
+  void _showDeliveredNotification(SmsMessage message, BuildContext context) async {
+    final contacts = new ContactQuery();
+    Contact contact = await contacts.queryContact(message.address);
+    final snackBar = new SnackBar(content: new Text('Message to ${contact.fullName} delivered'));
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }
