@@ -290,7 +290,8 @@ class SmsSender {
   final EventChannel _stateChannel;
   Map<int, SmsMessage> _sentMessages;
   int _sentId = 0;
-  final StreamController<SmsMessage> _deliveredStreamController = new StreamController<SmsMessage>();
+  final StreamController<SmsMessage> _deliveredStreamController =
+      new StreamController<SmsMessage>();
 
   factory SmsSender() {
     if (_instance == null) {
@@ -348,16 +349,18 @@ class SmsSender {
     int id = stateChange['sentId'];
     if (_sentMessages.containsKey(id)) {
       switch (stateChange['state']) {
-        case 'sent': {
-          _sentMessages[id].state = SmsMessageState.Sent;
-          break;
-        }
-        case 'delivered': {
-          _sentMessages[id].state = SmsMessageState.Delivered;
-          _deliveredStreamController.add(_sentMessages[id]);
-          _sentMessages.remove(id);
-          break;
-        }
+        case 'sent':
+          {
+            _sentMessages[id].state = SmsMessageState.Sent;
+            break;
+          }
+        case 'delivered':
+          {
+            _sentMessages[id].state = SmsMessageState.Delivered;
+            _deliveredStreamController.add(_sentMessages[id]);
+            _sentMessages.remove(id);
+            break;
+          }
       }
     }
   }
