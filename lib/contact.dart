@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
@@ -175,7 +174,7 @@ class ContactQuery {
 class UserProfile {
   String _fullName;
   Photo _photo;
-  List<String> _addresses;
+  List<String> _addresses = new List<String>();
 
   UserProfile();
 
@@ -216,7 +215,10 @@ class UserProfileProvider {
 
   Future<UserProfile> getUserProfile() async {
     return await _channel.invokeMethod("getUserProfile").then((dynamic val) {
-      return new UserProfile._fromJson(val);
+      if (val == null)
+        return new UserProfile();
+      else
+        return new UserProfile._fromJson(val);
     });
   }
 }
