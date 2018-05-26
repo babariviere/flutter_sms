@@ -18,7 +18,8 @@ class Thread extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      leading: new Avatar(thread.contact.photo, thread.contact.fullName),
+      dense: true,
+      leading: new Avatar(thread.contact.thumbnail, thread.contact.fullName),
       title: new Text(thread.contact.fullName ?? thread.contact.address),
       subtitle: new Text(
         thread.messages.first.body.trim(),

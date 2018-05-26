@@ -47,7 +47,7 @@ class Message extends StatelessWidget {
             ),
           ),
           new Container(
-            child: new Avatar(userProfile.photo, userProfile.fullName),
+            child: new Avatar(userProfile.thumbnail, userProfile.fullName),
             margin: new EdgeInsets.only(left: 10.0),
           ),
         ],
@@ -62,7 +62,7 @@ class Message extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           new Container(
-            child: new Avatar(thread.contact.photo, thread.contact.fullName),
+            child: new Avatar(thread.contact.thumbnail, thread.contact.fullName),
             margin: new EdgeInsets.only(right: 10.0),
           ),
           new Expanded(

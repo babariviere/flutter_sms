@@ -4,48 +4,20 @@ import 'package:flutter/services.dart';
 
 /// Class that represents the photo of a [Contact]
 class Photo {
-  Uri _photoUri;
-  Uri _thumbnailUri;
+  final Uri _uri;
+  final bool _isFullSize;
   Uint8List _bytes;
-  Uint8List _thumbnailBytes;
 
-  Photo(Uri photoUri, Uri thumbnailUri) {
-    this._photoUri = photoUri;
-    this._thumbnailUri = thumbnailUri;
-  }
+  Uint8List get bytes => _bytes;
 
-  /// Gets the full size photo Uri
-  Uri get uri => this._photoUri;
-
-  /// Gets the thumbnail photo Uri
-  Uri get thumbnailUri => this._thumbnailUri;
+  Photo(this._uri, {bool isFullSize = false}) : _isFullSize = isFullSize;
 
   /// Get the bytes of the photo.
-  /// By default the returned bytes are the thumbnail representation
-  /// of the contact's photo. To retrieve the full size photo the
-  /// optional parameter [fullSize] must by set to 'true';
-  Future<Uint8List> readBytes({bool fullSize = false}) async {
-    if (fullSize) {
-      return await _readFullSizeBytes();
-    } else {
-      return await _readThumbnailBytes();
-    }
-  }
-
-  Future<Uint8List> _readThumbnailBytes() async {
-    if (this._thumbnailUri != null && this._thumbnailBytes == null) {
-      var photoQuery = new ContactPhotoQuery();
-      this._thumbnailBytes =
-          await photoQuery.queryContactPhoto(this._thumbnailUri);
-    }
-    return _thumbnailBytes;
-  }
-
-  Future<Uint8List> _readFullSizeBytes() async {
-    if (this._photoUri != null && this._bytes == null) {
+  Future<Uint8List> _readBytes() async {
+    if (this._uri != null && this._bytes == null) {
       var photoQuery = new ContactPhotoQuery();
       this._bytes =
-          await photoQuery.queryContactPhoto(this._photoUri, fullSize: true);
+          await photoQuery.queryContactPhoto(this._uri, fullSize: _isFullSize);
     }
     return _bytes;
   }
@@ -85,10 +57,15 @@ class Contact {
   String _firstName;
   String _lastName;
   String _address;
+  Photo _thumbnail;
   Photo _photo;
 
   Contact(String address,
-      {String firstName, String lastName, String fullName, Photo photo}) {
+      {String firstName,
+      String lastName,
+      String fullName,
+      Photo thumbnail,
+      Photo photo}) {
     this._address = address;
     this._firstName = firstName;
     this._lastName = lastName;
@@ -97,6 +74,7 @@ class Contact {
     } else {
       this._fullName = fullName;
     }
+    this._thumbnail = thumbnail;
     this._photo = photo;
   }
 
@@ -112,9 +90,11 @@ class Contact {
     if (data.containsKey("name")) {
       this._fullName = data["name"];
     }
-    if (data.containsKey("photo") && data.containsKey("thumbnail")) {
-      this._photo =
-          new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
+    if (data.containsKey("photo")) {
+      this._photo = new Photo(Uri.parse(data["photo"]), isFullSize: true);
+    }
+    if (data.containsKey("thumbnail")) {
+      this._thumbnail = new Photo(Uri.parse(data["thumbnail"]));
     }
   }
 
@@ -127,6 +107,8 @@ class Contact {
   String get address => this._address;
 
   Photo get photo => this._photo;
+
+  Photo get thumbnail => this._thumbnail;
 }
 
 /// Called when sending SMS failed
@@ -161,9 +143,15 @@ class ContactQuery {
       throw ("already requested");
     }
     inProgress[address] = true;
-    return await _channel
-        .invokeMethod("getContact", {"address": address}).then((dynamic val) {
+    return await _channel.invokeMethod("getContact", {"address": address}).then(
+        (dynamic val) async {
       Contact contact = new Contact.fromJson(address, val);
+      if (contact.thumbnail != null) {
+        await contact.thumbnail._readBytes();
+      }
+      if (contact.photo != null) {
+        await contact.photo._readBytes();
+      }
       queried[address] = contact;
       inProgress[address] = false;
       return contact;
@@ -174,6 +162,7 @@ class ContactQuery {
 class UserProfile {
   String _fullName;
   Photo _photo;
+  Photo _thumbnail;
   List<String> _addresses = new List<String>();
 
   UserProfile();
@@ -182,9 +171,11 @@ class UserProfile {
     if (data.containsKey("name")) {
       this._fullName = data["name"];
     }
-    if (data.containsKey("photo") && data.containsKey("thumbnail")) {
-      this._photo =
-          new Photo(Uri.parse(data["photo"]), Uri.parse(data["thumbnail"]));
+    if (data.containsKey("photo")) {
+      this._photo = new Photo(Uri.parse(data["photo"]), isFullSize: true);
+    }
+    if (data.containsKey("thumbnail")) {
+      this._thumbnail = new Photo(Uri.parse(data["thumbnail"]));
     }
     if (data.containsKey("addresses")) {
       _addresses = List.from(data["addresses"]);
@@ -194,6 +185,8 @@ class UserProfile {
   String get fullName => _fullName;
 
   Photo get photo => _photo;
+
+  Photo get thumbnail => _thumbnail;
 
   List<String> get addresses => _addresses;
 }
@@ -214,11 +207,19 @@ class UserProfileProvider {
   UserProfileProvider._private(this._channel);
 
   Future<UserProfile> getUserProfile() async {
-    return await _channel.invokeMethod("getUserProfile").then((dynamic val) {
+    return await _channel.invokeMethod("getUserProfile").then((dynamic val) async {
       if (val == null)
         return new UserProfile();
-      else
-        return new UserProfile._fromJson(val);
+      else {
+        var userProfile = new UserProfile._fromJson(val);
+        if (userProfile.thumbnail != null) {
+          await userProfile.thumbnail._readBytes();
+        }
+        if (userProfile.photo != null) {
+          await userProfile.photo._readBytes();
+        }
+        return userProfile;
+      }
     });
   }
 }
