@@ -8,11 +8,12 @@ class Photo {
   final bool _isFullSize;
   Uint8List _bytes;
 
+  /// Gets the bytes of the photo.
   Uint8List get bytes => _bytes;
 
   Photo(this._uri, {bool isFullSize = false}) : _isFullSize = isFullSize;
 
-  /// Get the bytes of the photo.
+  /// Read async the bytes of the photo.
   Future<Uint8List> _readBytes() async {
     if (this._uri != null && this._bytes == null) {
       var photoQuery = new ContactPhotoQuery();
@@ -98,16 +99,21 @@ class Contact {
     }
   }
 
+  /// Gets the full name of the [Contact]
   String get fullName => this._fullName;
 
   String get firstName => this._firstName;
 
   String get lastName => this._lastName;
 
+  /// Gets the address of the [Contact] (the phone number)
   String get address => this._address;
 
+  /// Gets the full size photo of the [Contact] if any, otherwise returns null.
   Photo get photo => this._photo;
 
+  /// Gets the thumbnail representation of the [Contact] photo if any,
+  /// otherwise returns null.
   Photo get thumbnail => this._thumbnail;
 }
 
@@ -159,13 +165,15 @@ class ContactQuery {
   }
 }
 
+/// Class that represents the data of the device's owner.
 class UserProfile {
   String _fullName;
   Photo _photo;
   Photo _thumbnail;
-  List<String> _addresses = new List<String>();
+  List<String> _addresses;
 
-  UserProfile();
+  UserProfile()
+      :_addresses = new List<String>();
 
   UserProfile._fromJson(Map data) {
     if (data.containsKey("name")) {
@@ -182,15 +190,22 @@ class UserProfile {
     }
   }
 
+  /// Gets the full name of the [UserProfile]
   String get fullName => _fullName;
 
+  /// Gets the full size photo of the [UserProfile] if any,
+  /// otherwise returns null.
   Photo get photo => _photo;
 
+  /// Gets the thumbnail representation of the [UserProfile] photo if any,
+  /// otherwise returns null.
   Photo get thumbnail => _thumbnail;
 
+  /// Gets the collection of phone numbers of the [UserProfile]
   List<String> get addresses => _addresses;
 }
 
+/// Used to get the user profile
 class UserProfileProvider {
   static UserProfileProvider _instance;
   final MethodChannel _channel;
@@ -206,6 +221,7 @@ class UserProfileProvider {
 
   UserProfileProvider._private(this._channel);
 
+  /// Returns the [UserProfile] data.
   Future<UserProfile> getUserProfile() async {
     return await _channel.invokeMethod("getUserProfile").then((dynamic val) async {
       if (val == null)
