@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:sms/sms.dart';
 import './conversationStore.dart';
 import '../conversations/avatar.dart';
+import 'arrow_painter.dart';
 
 class Message extends StatelessWidget {
   Message(SmsMessage message)
@@ -30,6 +31,7 @@ class Message extends StatelessWidget {
       child: new Stack(
         children: [
           new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new Expanded(
                 child: new Container(
@@ -49,14 +51,14 @@ class Message extends StatelessWidget {
                       )
                     ],
                   ),
-                  margin: new EdgeInsets.only(left: 50.0),
+                  margin: new EdgeInsets.only(left: 48.0),
                   padding: new EdgeInsets.all(10.0),
-                  decoration: new BoxDecoration(color: Colors.lightBlue[100]),
+                  color: Colors.lightBlue[100],
                 ),
               ),
               new Container(
                 child: new Avatar(userProfile.thumbnail, userProfile.fullName),
-                margin: new EdgeInsets.only(left: 10.0),
+                margin: new EdgeInsets.only(left: 8.0, top: 8.0),
               ),
             ],
           ),
@@ -64,7 +66,9 @@ class Message extends StatelessWidget {
             width: double.infinity,
             child: new CustomPaint(
               painter: new ArrowPainter(
-                  color: Colors.lightBlue[100], direction: ArrowDirection.Right),
+                color: Colors.lightBlue[100],
+                direction: ArrowDirection.Right
+              ),
             ),
           ),
         ],
@@ -79,17 +83,20 @@ class Message extends StatelessWidget {
       child: new Stack(
         children: [
           new Row(
-            children: <Widget>[
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               new Container(
                 child: new Avatar(
-                    thread.contact.thumbnail, thread.contact.fullName),
-                margin: new EdgeInsets.only(right: 10.0),
+                  thread.contact.thumbnail, 
+                  thread.contact.fullName
+                ),
+                margin: new EdgeInsets.only(right: 8.0, top: 8.0),
               ),
               new Expanded(
                 child: new Container(
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
+                    children: [
                       new Text(message.body.trim()),
                       new Align(
                         child: new Padding(
@@ -103,17 +110,19 @@ class Message extends StatelessWidget {
                       ),
                     ],
                   ),
-                  margin: new EdgeInsets.only(right: 50.0),
+                  margin: new EdgeInsets.only(right: 48.0),
                   padding: new EdgeInsets.all(10.0),
-                  decoration: new BoxDecoration(color: Colors.grey[300]),
+                  color: Colors.grey[300],
                 ),
               ),
             ],
           ),
           new CustomPaint(
             painter: new ArrowPainter(
-                color: Colors.grey[300], direction: ArrowDirection.Left),
-          )
+              color: Colors.grey[300], 
+              direction: ArrowDirection.Left
+            ),
+          ),
         ],
       ),
       margin: new EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
@@ -122,42 +131,5 @@ class Message extends StatelessWidget {
 
   get _time {
     return new TimeOfDay(hour: message.date.hour, minute: message.date.minute);
-  }
-}
-
-enum ArrowDirection { Left, Right }
-
-class ArrowPainter extends CustomPainter {
-  final Color color;
-  final ArrowDirection direction;
-  final _paint = new Paint();
-
-  ArrowPainter({this.color, this.direction}) {
-    _paint.color = this.color;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.save();
-    Path path = new Path();
-
-    if (this.direction == ArrowDirection.Left) {
-      canvas.translate(50.0, 0.0);
-      path.lineTo(-20.0, 0.0);
-    } else {
-      canvas.translate(size.width - 50.0, 0.0);
-      path.lineTo(20.0, 0.0);
-    }
-
-    path.lineTo(0.0, 20.0);
-    path.lineTo(0.0, 0.0);
-    canvas.drawPath(path, _paint);
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }
