@@ -7,7 +7,8 @@ typedef void MessageSentCallback(SmsMessage message);
 
 class FormSend extends StatelessWidget {
   final SmsThread thread;
-  final TextEditingController _textFieldController = new TextEditingController();
+  final TextEditingController _textFieldController =
+      new TextEditingController();
   final SmsSender _sender = new SmsSender();
 
   final MessageSentCallback onMessageSent;
@@ -34,7 +35,9 @@ class FormSend extends StatelessWidget {
           ),
           new IconButton(
             icon: new Icon(Icons.send),
-            onPressed: () { _sendMessage(context); },
+            onPressed: () {
+              _sendMessage(context);
+            },
             color: Colors.blue,
           )
         ],
@@ -43,7 +46,9 @@ class FormSend extends StatelessWidget {
   }
 
   void _sendMessage(BuildContext context) async {
-    SmsMessage message = new SmsMessage(thread.address, _textFieldController.text, threadId: thread.id);
+    SmsMessage message = new SmsMessage(
+        thread.address, _textFieldController.text,
+        threadId: thread.id);
     message.onStateChanged.listen((SmsMessageState state) {
       if (state == SmsMessageState.Delivered) {
         print('Message delivered to ${message.address}');
@@ -59,10 +64,12 @@ class FormSend extends StatelessWidget {
     onMessageSent(message);
   }
 
-  void _showDeliveredNotification(SmsMessage message, BuildContext context) async {
+  void _showDeliveredNotification(
+      SmsMessage message, BuildContext context) async {
     final contacts = new ContactQuery();
     Contact contact = await contacts.queryContact(message.address);
-    final snackBar = new SnackBar(content: new Text('Message to ${contact.fullName} delivered'));
+    final snackBar = new SnackBar(
+        content: new Text('Message to ${contact.fullName} delivered'));
     Scaffold.of(context).showSnackBar(snackBar);
   }
 }
