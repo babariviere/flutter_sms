@@ -50,7 +50,7 @@ class SmsMessage implements Comparable<SmsMessage> {
     this._kind = kind;
   }
 
-  /// Read message fron JSON
+  /// Read message from JSON
   ///
   /// Format:
   ///
