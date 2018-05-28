@@ -116,9 +116,6 @@ Uint8List fullSize = contact.photo.bytes;
 Uint8List thumbnail = contact.thumbnail.bytes;
 ```
 
-**Note**: _the use of `await` keyword means that `readBytes()` is resolved asynchronously
-and a Future is returned._
-
 ## User Profile
 
 Some times it is useful to request basic info of the phone owner, like the contact photo, addresses, etc.
