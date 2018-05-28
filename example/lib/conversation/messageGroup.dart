@@ -16,7 +16,6 @@ class MessageGroup extends StatelessWidget {
     final userProfile = ConversationStore.of(context).userProfile;
     final thread = ConversationStore.of(context).thread;
 
-
     List<Widget> widgets = <Widget>[
       new Container(
         child: new Text(_formatDatetime(group.messages[0], context)),
@@ -26,9 +25,11 @@ class MessageGroup extends StatelessWidget {
 
     for (int i = 0; i < group.messages.length; i++) {
       if (group.messages[i].kind == SmsMessageKind.Sent) {
-        widgets.add(new SentMessage(group.messages[i], _isCompactMode(i), userProfile));
+        widgets.add(
+            new SentMessage(group.messages[i], _isCompactMode(i), userProfile));
       } else {
-        widgets.add(new ReceivedMessage(group.messages[i], _isCompactMode(i), thread.contact));
+        widgets.add(new ReceivedMessage(
+            group.messages[i], _isCompactMode(i), thread.contact));
       }
     }
 
