@@ -112,9 +112,8 @@ You can retrieve the photo of the contact (full size or thumbnail):
 
 ```dart
 ...
-Photo photo = contact.photo;
-Uint8List thumbnail = await photo.readBytes();
-Uint8List fullSize = await photo.readBytes(fullSize: true);
+Uint8List fullSize = contact.photo.bytes;
+Uint8List thumbnail = contact.thumbnail.bytes;
 ```
 
 **Note**: _the use of `await` keyword means that `readBytes()` is resolved asynchronously
