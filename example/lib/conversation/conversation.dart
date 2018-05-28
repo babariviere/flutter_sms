@@ -35,8 +35,7 @@ class _ConversationState extends State<Conversation> {
       appBar: new AppBar(
         title: new Text(
             widget.thread.contact.fullName ?? widget.thread.contact.address),
-        backgroundColor:
-            ContactColor.getColor(widget.thread.contact.fullName),
+        backgroundColor: ContactColor.getColor(widget.thread.contact.fullName),
       ),
       body: new Column(
         children: <Widget>[
@@ -44,9 +43,7 @@ class _ConversationState extends State<Conversation> {
             child: new ConversationStore(
               widget.userProfile,
               widget.thread,
-              child: new Messages(
-                widget.thread.messages
-              ),
+              child: new Messages(widget.thread.messages),
             ),
           ),
           new FormSend(
