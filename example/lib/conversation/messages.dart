@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:sms/sms.dart';
-import '../utils/group.dart';
-import './messageGroup.dart';
+import 'package:sms_example/conversation/messageGroup.dart';
+import 'package:sms_example/utils/group.dart';
 
 class Messages extends StatelessWidget {
   final List<SmsMessage> messages;
 
-  Messages(this.messages, {Key key}) : super(key: key);
+  Messages(this.messages);
 
   @override
   Widget build(BuildContext context) {
     final groups = MessageGroupService.of(context).groupByDate(messages);
-
     return new ListView.builder(
         reverse: true,
         itemCount: groups.length,

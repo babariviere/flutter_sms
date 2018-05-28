@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
-import './thread.dart';
+import 'package:sms_example/conversations/thread.dart';
 
 class Threads extends StatefulWidget {
   @override

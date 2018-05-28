@@ -1,24 +1,22 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 
+
 class ConversationStore extends InheritedWidget {
-  const ConversationStore(
-      {Key key,
-      @required this.thread,
-      @required this.userProfile,
-      @required Widget child})
-      : super(key: key, child: child);
 
-  final SmsThread thread;
+  const ConversationStore(this.userProfile, this.thread, {Widget child})
+      :super(child: child);
+
   final UserProfile userProfile;
+  final SmsThread thread;
 
-  static ConversationStore of(BuildContext context) {
-    return context.inheritFromWidgetOfExactType(ConversationStore);
+  static ConversationStore of (BuildContext context) {
+    return context.inheritFromWidgetOfExactType(ConversationStore) as ConversationStore;
   }
 
   @override
-  bool updateShouldNotify(ConversationStore old) =>
-      thread != old.thread || userProfile != old.userProfile;
+  bool updateShouldNotify(InheritedWidget oldWidget) {
+    return true;
+  }
 }
