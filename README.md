@@ -13,7 +13,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 
 ## Installation and Usage
 
-Once you're familiar with Flutter you may install this package adding `sms` (0.1.1 or higher) to the dependencies list
+Once you're familiar with Flutter you may install this package adding `sms` (0.1.2 or higher) to the dependencies list
 of the `pubspec.yaml` file as follow:
 
 ```yaml
@@ -21,7 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  sms: ^0.1.1
+  sms: ^0.1.2
 ```
 
 Then run the command `flutter packages get` on the console.
