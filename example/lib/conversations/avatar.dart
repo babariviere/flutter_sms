@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
-import 'package:sms_example/utils/colors.dart';
+
+import '../utils/colors.dart';
 
 class Avatar extends StatelessWidget {
   Avatar(Photo photo, String alternativeText)

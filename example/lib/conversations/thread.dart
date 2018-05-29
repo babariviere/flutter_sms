@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
-import 'package:sms_example/conversation/conversation.dart';
-import 'package:sms_example/conversations/avatar.dart';
-import 'package:sms_example/conversations/badge.dart';
+
+import '../conversation/conversation.dart';
+import 'avatar.dart';
+import 'badge.dart';
 
 class Thread extends StatelessWidget {
   Thread(SmsThread thread, UserProfile userProfile)

@@ -172,8 +172,7 @@ class UserProfile {
   Photo _thumbnail;
   List<String> _addresses;
 
-  UserProfile()
-      :_addresses = new List<String>();
+  UserProfile() : _addresses = new List<String>();
 
   UserProfile._fromJson(Map data) {
     if (data.containsKey("name")) {
@@ -223,7 +222,9 @@ class UserProfileProvider {
 
   /// Returns the [UserProfile] data.
   Future<UserProfile> getUserProfile() async {
-    return await _channel.invokeMethod("getUserProfile").then((dynamic val) async {
+    return await _channel
+        .invokeMethod("getUserProfile")
+        .then((dynamic val) async {
       if (val == null)
         return new UserProfile();
       else {

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
-import 'package:sms_example/conversation/arrow_painter.dart';
-import 'package:sms_example/conversations/avatar.dart';
+
+import '../conversations/avatar.dart';
+import 'arrow_painter.dart';
 
 abstract class Message extends StatelessWidget {
   Message(this.message,
