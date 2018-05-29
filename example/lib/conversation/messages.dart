@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sms/sms.dart';
-import 'package:sms_example/conversation/messageGroup.dart';
-import 'package:sms_example/utils/group.dart';
+
+import '../utils/group.dart';
+import 'messageGroup.dart';
 
 class Messages extends StatelessWidget {
   final List<SmsMessage> messages;
