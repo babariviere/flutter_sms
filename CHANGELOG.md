@@ -1,3 +1,8 @@
+## [0.1.3] - 2018-05-29
+* Error in Android 4.x because of missing permission 'READ_PROFILE' fixed
+* Updated Flutter environment sdk to ">=1.19.0 <2.0.0"
+* Example app code refactoring
+
 ## [0.1.2] - 2018-05-26
 * Photo and thumbnail of a contact get loaded with the contact, no need to request them later.
 * Example app UI slightly enhanced.
