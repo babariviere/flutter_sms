@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
+import '../sim/sim_bloc_provider.dart';
+import '../sim/example_sms.dart';
 
 typedef void MessageSentCallback(SmsMessage message);
 
@@ -37,10 +39,18 @@ class FormSend extends StatelessWidget {
             icon: new Row(
               children: [
                 new Icon(Icons.sim_card, color: Colors.grey,),
-                new Text('1'),
+                new StreamBuilder<SimCard>(
+                  stream: SimBlocProvider.of(context).onSelectedSimChanged,
+                  initialData: new SimCard(slot: 1, imei: ''),
+                  builder: (context, snapshot) {
+                    return new Text(snapshot.data.slot.toString());
+                  },
+                ),
               ],
             ),
-            onPressed: (){}
+            onPressed: (){
+              SimBlocProvider.of(context).toggleSelectedSim();
+            }
           ),
           new IconButton(
             icon: new Icon(Icons.send),
