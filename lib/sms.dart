@@ -3,6 +3,7 @@ library sms;
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
@@ -319,7 +320,7 @@ class SmsSender {
   /// Take a message in argument + 2 functions that will be called on success or on error
   ///
   /// This function will not set automatically thread id, you have to do it
-  Future<SmsMessage> sendSms(SmsMessage msg) async {
+  Future<SmsMessage> sendSms(SmsMessage msg, {SimCard simCard}) async {
     if (msg == null || msg.address == null || msg.body == null) {
       if (msg == null) {
         throw ("no given message");
@@ -488,5 +489,29 @@ class SmsQuery {
       threads.add(thread);
     }
     return threads;
+  }
+}
+
+/// Represents a device's sim card info
+class SimCard {
+  final int slot;
+  final String imei;
+
+  SimCard({
+    @required this.slot,
+    @required this.imei
+  });
+}
+
+class SimCardsProvider {
+  const SimCardsProvider();
+
+  Future<List<SimCard>> getSimCards() {
+    return new Future.delayed(new Duration(milliseconds: 100), (){
+      return [
+        new SimCard(slot: 1, imei: 'imei-1'),
+        new SimCard(slot: 2, imei: 'imei-2')
+      ];
+    });
   }
 }

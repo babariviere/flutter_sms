@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sms/contact.dart';
 import 'package:sms/sms.dart';
 import '../sim/sim_bloc_provider.dart';
-import '../sim/example_sms.dart';
 
 typedef void MessageSentCallback(SmsMessage message);
 
@@ -40,7 +39,7 @@ class FormSend extends StatelessWidget {
               children: [
                 new Icon(Icons.sim_card, color: Colors.grey,),
                 new StreamBuilder<SimCard>(
-                  stream: SimBlocProvider.of(context).onSelectedSimChanged,
+                  stream: SimCardsBlocProvider.of(context).onSimCardChanged,
                   initialData: new SimCard(slot: 1, imei: ''),
                   builder: (context, snapshot) {
                     return new Text(snapshot.data.slot.toString());
@@ -49,7 +48,7 @@ class FormSend extends StatelessWidget {
               ],
             ),
             onPressed: (){
-              SimBlocProvider.of(context).toggleSelectedSim();
+              SimCardsBlocProvider.of(context).toggleSelectedSim();
             }
           ),
           new IconButton(
@@ -73,19 +72,20 @@ class FormSend extends StatelessWidget {
     message.onStateChanged.listen((SmsMessageState state) {
       if (state == SmsMessageState.Delivered) {
         print('Message delivered to ${message.address}');
-        _notifyMsgDelivery(message, context);
+        _notifyDelivery(message, context);
       }
       if (state == SmsMessageState.Sent) {
         print('Message sent to ${message.address}');
       }
     });
 
-    await _sender.sendSms(message);
+    final simCard = SimCardsBlocProvider.of(context).selectedSimCard;
+    await _sender.sendSms(message, simCard: simCard);
     _textField.clear();
     onMessageSent(message);
   }
 
-  void _notifyMsgDelivery(SmsMessage message, BuildContext context) async {
+  void _notifyDelivery(SmsMessage message, BuildContext context) async {
     final contacts = new ContactQuery();
     Contact contact = await contacts.queryContact(message.address);
     final snackBar = new SnackBar(

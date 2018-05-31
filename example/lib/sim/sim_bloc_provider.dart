@@ -1,26 +1,26 @@
 import 'package:flutter/widgets.dart';
 import 'sim_bloc.dart';
 
-class SimBlocProvider extends InheritedWidget {
-  SimBlocProvider({
-    this.simBloc,
+class SimCardsBlocProvider extends InheritedWidget {
+  SimCardsBlocProvider({
+    this.simCardBloc,
     @required Widget child
   }) : assert(child != null),
        super(child: child);
 
-  final SimBloc simBloc;
+  final SimCardsBloc simCardBloc;
 
-  static SimBloc of(BuildContext context) {
-    final provider = context.inheritFromWidgetOfExactType(SimBlocProvider);
+  static SimCardsBloc of(BuildContext context) {
+    final provider = context.inheritFromWidgetOfExactType(SimCardsBlocProvider);
     if (provider != null) {
-      return (provider as SimBlocProvider).simBloc;
+      return (provider as SimCardsBlocProvider).simCardBloc;
     }
 
     return null;
   }
 
   @override
-  bool updateShouldNotify(SimBlocProvider old) {
-    return simBloc != old.simBloc;
+  bool updateShouldNotify(SimCardsBlocProvider old) {
+    return simCardBloc != old.simCardBloc;
   }
 }

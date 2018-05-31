@@ -7,8 +7,8 @@ import './conversations/threads.dart';
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new SimBlocProvider(
-      simBloc: new SimBloc(),
+    return new SimCardsBlocProvider(
+      simCardBloc: new SimCardsBloc(),
       child: new MaterialApp(
         title: 'Flutter SMS',
         home: new Threads(),

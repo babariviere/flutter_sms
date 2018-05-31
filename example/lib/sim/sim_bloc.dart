@@ -1,43 +1,45 @@
 
 import 'dart:async';
 
-import 'example_sms.dart';
+import 'package:sms/sms.dart';
 
-class SimBloc {
-  final _simCardsManager = const SimCardsManager();
+class SimCardsBloc {
+  final _simCardsProvider = const SimCardsProvider();
   final _streamController = new StreamController<SimCard>();
-  List<SimCard> _simCollection;
-  SimCard _selectedSim;
+  List<SimCard> _simCards;
+  SimCard _selectedSimCard;
 
-  Stream<SimCard> get onSelectedSimChanged => _streamController.stream;
+  Stream<SimCard> get onSimCardChanged => _streamController.stream;
+
+  SimCard get selectedSimCard => _selectedSimCard;
 
   void toggleSelectedSim() async {
-    if (_simCollection == null) {
-      _simCollection = await _simCardsManager.querySimCards();
+    if (_simCards == null) {
+      _simCards = await _simCardsProvider.getSimCards();
     }
 
-    _selectNextSim();
-    _streamController.add(_selectedSim);
+    _selectNextSimCard();
+    _streamController.add(_selectedSimCard);
   }
 
-  SimCard _selectNextSim() {
-    if (_selectedSim == null) {
-      _selectedSim = _simCollection[0];
-      return _selectedSim;
+  SimCard _selectNextSimCard() {
+    if (_selectedSimCard == null) {
+      _selectedSimCard = _simCards[0];
+      return _selectedSimCard;
     }
 
-    for(var i = 0; i < _simCollection.length; i++) {
-      if (_simCollection[i].imei == _selectedSim.imei) {
-        if (i + 1 < _simCollection.length) {
-          _selectedSim = _simCollection[i + 1];
+    for(var i = 0; i < _simCards.length; i++) {
+      if (_simCards[i].imei == _selectedSimCard.imei) {
+        if (i + 1 < _simCards.length) {
+          _selectedSimCard = _simCards[i + 1];
         }
         else {
-          _selectedSim = _simCollection[0];
+          _selectedSimCard = _simCards[0];
         }
         break;
       }
     }
 
-    return _selectedSim;
+    return _selectedSimCard;
   }
 }
