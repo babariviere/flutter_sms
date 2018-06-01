@@ -2,11 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'sim_bloc.dart';
 
 class SimCardsBlocProvider extends InheritedWidget {
-  SimCardsBlocProvider({
-    this.simCardBloc,
-    @required Widget child
-  }) : assert(child != null),
-       super(child: child);
+  SimCardsBlocProvider({this.simCardBloc, @required Widget child})
+      : assert(child != null),
+        super(child: child);
 
   final SimCardsBloc simCardBloc;
 
