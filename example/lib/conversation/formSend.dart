@@ -7,7 +7,6 @@ import '../sim/sim_bloc_provider.dart';
 typedef void MessageSentCallback(SmsMessage message);
 
 class FormSend extends StatelessWidget {
-
   FormSend(this.thread, {this.onMessageSent});
 
   final SmsThread thread;
@@ -28,29 +27,37 @@ class FormSend extends StatelessWidget {
                 decoration: new InputDecoration(
                   border: InputBorder.none,
                   labelStyle: new TextStyle(fontSize: 16.0),
-                  hintText: "Send message:"
+                  hintText: "Send message:",
                 ),
               ),
               padding: new EdgeInsets.only(left: 20.0, top: 8.0, bottom: 8.0),
             ),
           ),
           new IconButton(
-            icon: new Row(
-              children: [
-                new Icon(Icons.sim_card, color: Colors.grey,),
-                new StreamBuilder<SimCard>(
+              icon: new StreamBuilder<SimCard>(
                   stream: SimCardsBlocProvider.of(context).onSimCardChanged,
                   initialData: new SimCard(slot: 1, imei: ''),
                   builder: (context, snapshot) {
-                    return new Text(snapshot.data.slot.toString());
-                  },
-                ),
-              ],
-            ),
-            onPressed: (){
-              SimCardsBlocProvider.of(context).toggleSelectedSim();
-            }
-          ),
+                    return new Row(
+                      children: [
+                        new Icon(
+                            Icons.sim_card,
+                            color: snapshot.data.state == SimCardState.Ready
+                                ? Colors.blue
+                                : Colors.grey
+                        ),
+                        new Text(snapshot.data.slot.toString(),
+                          style: new TextStyle(color: snapshot.data.state == SimCardState.Ready
+                              ? Colors.black
+                              : Colors.grey
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+              onPressed: () {
+                SimCardsBlocProvider.of(context).toggleSelectedSim();
+              }),
           new IconButton(
             icon: new Icon(Icons.send),
             onPressed: () {
@@ -64,11 +71,8 @@ class FormSend extends StatelessWidget {
   }
 
   void _sendMessage(BuildContext context) async {
-    SmsMessage message = new SmsMessage(
-        thread.address,
-        _textField.text,
-        threadId: thread.id
-    );
+    SmsMessage message =
+        new SmsMessage(thread.address, _textField.text, threadId: thread.id);
     message.onStateChanged.listen((SmsMessageState state) {
       if (state == SmsMessageState.Delivered) {
         print('Message delivered to ${message.address}');
@@ -89,8 +93,7 @@ class FormSend extends StatelessWidget {
     final contacts = new ContactQuery();
     Contact contact = await contacts.queryContact(message.address);
     final snackBar = new SnackBar(
-      content: new Text('Message to ${contact.fullName} delivered')
-    );
+        content: new Text('Message to ${contact.fullName} delivered'));
     Scaffold.of(context).showSnackBar(snackBar);
   }
 }

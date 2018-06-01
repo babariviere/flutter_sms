@@ -492,26 +492,83 @@ class SmsQuery {
   }
 }
 
+enum SimCardState {
+  Unknown,
+  Absent,
+  PinRequired,
+  PukRequired,
+  Locked,
+  Ready,
+}
+
 /// Represents a device's sim card info
 class SimCard {
-  final int slot;
-  final String imei;
+  int slot;
+  String imei;
+  SimCardState state;
 
   SimCard({
     @required this.slot,
-    @required this.imei
-  });
+    @required this.imei,
+    this.state = SimCardState.Unknown
+  }) : assert(slot != null),
+       assert(imei != null);
+
+  SimCard.fromJson(Map map) {
+    if (map.containsKey('slot')) {
+      this.slot = map['slot'];
+    }
+    if (map.containsKey('imei')) {
+      this.imei = map['imei'];
+    }
+    if (map.containsKey('state')) {
+      switch(map['state']) {
+        case 0:
+          this.state = SimCardState.Unknown;
+          break;
+        case 1:
+          this.state = SimCardState.Absent;
+          break;
+        case 2:
+          this.state = SimCardState.PinRequired;
+          break;
+        case 3:
+          this.state = SimCardState.PukRequired;
+          break;
+        case 4:
+          this.state = SimCardState.Locked;
+          break;
+        case 5:
+          this.state = SimCardState.Ready;
+          break;
+      }
+    }
+  }
 }
 
 class SimCardsProvider {
-  const SimCardsProvider();
+  static SimCardsProvider _instance;
+  final MethodChannel _channel;
 
-  Future<List<SimCard>> getSimCards() {
-    return new Future.delayed(new Duration(milliseconds: 100), (){
-      return [
-        new SimCard(slot: 1, imei: 'imei-1'),
-        new SimCard(slot: 2, imei: 'imei-2')
-      ];
-    });
+  factory SimCardsProvider() {
+    if (_instance == null) {
+      final MethodChannel methodChannel = const MethodChannel(
+          "plugins.babariviere.com/simCards", const JSONMethodCodec());
+      _instance = new SimCardsProvider._private(methodChannel);
+    }
+    return _instance;
+  }
+
+  SimCardsProvider._private(this._channel);
+
+  Future<List<SimCard>> getSimCards() async {
+    final simCards = new List<SimCard>();
+
+    dynamic response = await _channel.invokeMethod('getSimCards', null);
+    for(Map map in response) {
+      simCards.add(new SimCard.fromJson(map));
+    }
+
+    return simCards;
   }
 }

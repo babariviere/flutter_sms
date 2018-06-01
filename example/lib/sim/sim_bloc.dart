@@ -1,15 +1,20 @@
-
 import 'dart:async';
 
 import 'package:sms/sms.dart';
 
 class SimCardsBloc {
-  final _simCardsProvider = const SimCardsProvider();
+
+  SimCardsBloc() {
+    _onSimCardChanged = _streamController.stream.asBroadcastStream();
+  }
+
+  final _simCardsProvider = new SimCardsProvider();
   final _streamController = new StreamController<SimCard>();
+  Stream<SimCard> _onSimCardChanged;
   List<SimCard> _simCards;
   SimCard _selectedSimCard;
 
-  Stream<SimCard> get onSimCardChanged => _streamController.stream;
+  Stream<SimCard> get onSimCardChanged => _onSimCardChanged;
 
   SimCard get selectedSimCard => _selectedSimCard;
 
@@ -28,12 +33,11 @@ class SimCardsBloc {
       return _selectedSimCard;
     }
 
-    for(var i = 0; i < _simCards.length; i++) {
+    for (var i = 0; i < _simCards.length; i++) {
       if (_simCards[i].imei == _selectedSimCard.imei) {
         if (i + 1 < _simCards.length) {
           _selectedSimCard = _simCards[i + 1];
-        }
-        else {
+        } else {
           _selectedSimCard = _simCards[0];
         }
         break;
