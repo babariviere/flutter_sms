@@ -338,6 +338,10 @@ class SmsSender {
     map['sentId'] = this._sentId;
     this._sentId += 1;
 
+    if (simCard != null) {
+      map['simCard'] = simCard.imei;
+    }
+
     await _channel.invokeMethod("sendSMS", map);
     msg.date = new DateTime.now();
 
