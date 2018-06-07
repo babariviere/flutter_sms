@@ -1,4 +1,4 @@
-![xxhdpi](https://user-images.githubusercontent.com/37498811/41118114-d9cad440-6ab0-11e8-9254-68d6aac245be.png) ![xxhdpi](https://user-images.githubusercontent.com/37498811/41118099-ce36c3fa-6ab0-11e8-8976-b1940191e3a6.png)
+![xxhdpi](https://user-images.githubusercontent.com/37498811/41118114-d9cad440-6ab0-11e8-9254-68d6aac245be.png)
 
 
 # Flutter SMS
