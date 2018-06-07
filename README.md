@@ -209,6 +209,9 @@ void main() {
 - [x] Contact Photo (full size, thumbnail)
 - [x] User profile (basic info)
 
+## App logo
+Designed and created by <a href="https://github.com/saifulfrank">Imrul kayes</a>
+
 ## Contributions
 
 Any contribution is welcome.
