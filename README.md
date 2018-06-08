@@ -1,3 +1,6 @@
+![xxhdpi](https://user-images.githubusercontent.com/37498811/41118114-d9cad440-6ab0-11e8-9254-68d6aac245be.png)
+
+
 # Flutter SMS
 
 This is an SMS library for flutter.
@@ -43,7 +46,7 @@ void main() {
 
 ```dart
 List<SmsMessage> messages = await query.getAllSms;
-```
+``` 
 
 **Note**: _the use of `await` keyword means that `getAllSms` is resolved asynchronously
 and a Future is retorned._
@@ -205,6 +208,9 @@ void main() {
 - [x] Contact
 - [x] Contact Photo (full size, thumbnail)
 - [x] User profile (basic info)
+
+## App logo
+Designed and created by <a href="https://github.com/saifulfrank">Imrul kayes</a>
 
 ## Contributions
 
