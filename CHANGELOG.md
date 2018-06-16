@@ -1,3 +1,7 @@
+## [0.1.4] - 2018-06-16
+
+* Error on contact lookup because of unknown size fixed
+
 ## [0.1.3] - 2018-05-29
 * Error in Android 4.x because of missing permission 'READ_PROFILE' fixed
 * Updated Flutter environment sdk to ">=1.19.0 <2.0.0"
