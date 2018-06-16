@@ -14,6 +14,7 @@ import com.babariviere.sms.permisions.Permissions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -67,6 +68,15 @@ class ContactPhotoQueryHandler implements RequestPermissionsResultListener {
     }
   }
 
+  public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
+      ByteArrayOutputStream os = new ByteArrayOutputStream(); 
+      byte[] buffer = new byte[0xFFFF];
+      for (int len = is.read(buffer); len != -1; len = is.read(buffer)) { 
+          os.write(buffer, 0, len);
+      }
+      return os.toByteArray();
+  }
+
   @TargetApi(Build.VERSION_CODES.ECLAIR)
   private void queryContactPhoto() {
     Uri uri = Uri.withAppendedPath(ContactsContract.AUTHORITY_URI, photoUri);
@@ -75,9 +85,8 @@ class ContactPhotoQueryHandler implements RequestPermissionsResultListener {
       AssetFileDescriptor fd = registrar.context().getContentResolver().openAssetFileDescriptor(
           uri, "r");
       if (fd != null) {
-        byte[] bytes = new byte[(int) fd.getLength()];
         InputStream stream = fd.createInputStream();
-        stream.read(bytes);
+        byte[] bytes = getBytesFromInputStream(stream);
         stream.close();
         result.success(bytes);
       }
