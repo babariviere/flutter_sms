@@ -16,7 +16,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/pla
 
 ## Installation and Usage
 
-Once you're familiar with Flutter you may install this package adding `sms` (0.1.3 or higher) to the dependencies list
+Once you're familiar with Flutter you may install this package adding `sms` (0.1.4 or higher) to the dependencies list
 of the `pubspec.yaml` file as follow:
 
 ```yaml
@@ -24,7 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  sms: ^0.1.3
+  sms: ^0.1.4
 ```
 
 Then run the command `flutter packages get` on the console.
@@ -209,8 +209,14 @@ void main() {
 - [x] Contact Photo (full size, thumbnail)
 - [x] User profile (basic info)
 
-## App logo
-Designed and created by <a href="https://github.com/saifulfrank">Imrul kayes</a>
+## Contributors
+
+- babariviere [github](https://github.com/babariviere)
+- joanpablo [github](https://github.com/joanpablo)
+- saifulfrank [github](https://github.com/saifulfrank)
+
+### App logo
+Designed and created by [Imrul kayes](https://github.com/saifulfrank)
 
 ## Contributions
 
