@@ -16,6 +16,7 @@ class FormSend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final simCards = SimCardsBlocProvider.of(context);
     return new Material(
       elevation: 4.0,
       child: new Row(
@@ -35,16 +36,16 @@ class FormSend extends StatelessWidget {
           ),
           new IconButton(
               icon: new StreamBuilder<SimCard>(
-                  stream: SimCardsBlocProvider.of(context).onSimCardChanged,
-                  initialData: new SimCard(slot: 1, imei: ''),
+                  stream: simCards.onSimCardChanged,
+                  initialData: simCards.selectedSimCard,
                   builder: (context, snapshot) {
                     return new Row(
                       children: [
                         new Icon(
-                            Icons.sim_card,
-                            color: snapshot.data.state == SimCardState.Ready
-                                ? Colors.blue
-                                : Colors.grey
+                          Icons.sim_card,
+                          color: snapshot.data.state == SimCardState.Ready
+                              ? Colors.blue
+                              : Colors.grey
                         ),
                         new Text(snapshot.data.slot.toString(),
                           style: new TextStyle(color: snapshot.data.state == SimCardState.Ready

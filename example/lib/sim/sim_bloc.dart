@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:sms/sms.dart';
 
 class SimCardsBloc {
-
   SimCardsBloc() {
     _onSimCardChanged = _streamController.stream.asBroadcastStream();
   }
@@ -17,6 +16,15 @@ class SimCardsBloc {
   Stream<SimCard> get onSimCardChanged => _onSimCardChanged;
 
   SimCard get selectedSimCard => _selectedSimCard;
+
+  void loadSimCards() async {
+    _simCards = await _simCardsProvider.getSimCards();
+    _simCards.forEach((sim) {
+      if (sim.state == SimCardState.Ready) {
+        this.selectSimCard(sim);
+      }
+    });
+  }
 
   void toggleSelectedSim() async {
     if (_simCards == null) {
@@ -45,5 +53,10 @@ class SimCardsBloc {
     }
 
     return _selectedSimCard;
+  }
+
+  void selectSimCard(SimCard sim) {
+    _selectedSimCard = sim;
+    _streamController.add(_selectedSimCard);
   }
 }
