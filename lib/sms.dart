@@ -336,6 +336,9 @@ class SmsSender {
     Map map = msg.toMap;
     this._sentMessages.putIfAbsent(this._sentId, () => msg);
     map['sentId'] = this._sentId;
+    if (simCard != null) {
+      map['subId'] = simCard.slot;
+    }
     this._sentId += 1;
 
     if (simCard != null) {
