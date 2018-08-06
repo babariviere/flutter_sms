@@ -1,35 +1,48 @@
 package io.babariviere.sms
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener
 import org.json.JSONObject
 import java.util.*
 
-class SmsReceiver(private val registrar: Registrar) : EventChannel.StreamHandler {
+class SmsReceiver(private val registrar: Registrar) : EventChannel.StreamHandler, RequestPermissionsResultListener {
     private var receiver: BroadcastReceiver? = null
+    private var sink: EventSink? = null
+    private val permissions: Permissions = Permissions(registrar.activity())
+    private val permissionsList: Array<String> = arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS)
 
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+    override fun onListen(arguments: Any?, events: EventSink?) {
+        this.registrar.addRequestPermissionsResultListener(this)
         this.receiver = createReceiver(events)
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.registrar.context().registerReceiver(receiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
+        this.sink = events
+        this.permissions.checkAndRequestPermission(permissionsList, Permissions.RECV_SMS_ID_REQ);
+
     }
 
     override fun onCancel(p0: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.registrar.context().unregisterReceiver(this.receiver)
+        this.receiver = null
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private fun readMessages(intent: Intent): Array<SmsMessage> {
-        return Telephony.Sms.Intents.getMessagesFromIntent(intent);
+        return Telephony.Sms.Intents.getMessagesFromIntent(intent)
     }
 
-    private fun createReceiver(events: EventChannel.EventSink?): BroadcastReceiver {
+    private fun createReceiver(events: EventSink?): BroadcastReceiver {
         return object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val messages = readMessages(intent ?: return)
@@ -55,5 +68,18 @@ class SmsReceiver(private val registrar: Registrar) : EventChannel.StreamHandler
                 events?.success(json)
             }
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
+        if (requestCode != Permissions.RECV_SMS_ID_REQ) {
+            return false
+        }
+        if (grantResults == null) return false
+        var isOk = true
+        grantResults.forEach { result ->
+            if (result != PackageManager.PERMISSION_GRANTED) isOk = false
+        }
+        if (!isOk) this.sink?.endOfStream()
+        return isOk
     }
 }
