@@ -1,3 +1,7 @@
+## [0.1.6] - 2018-08-07
+
+* Fix permission error when sending SMS on Android O and above
+
 ## [0.1.5] - 2018-08-06
 
 * Fix permission error on Android M and above
