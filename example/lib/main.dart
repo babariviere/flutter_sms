@@ -19,6 +19,9 @@ class _MyAppState extends State<MyApp> {
     receiver.listen((sms) {
       print("Address: " + sms.address + ", body: " + sms.body);
     });
+
+    var sender = SmsSender();
+    sender.send(SmsMessage("0782428978", "Hello World"));
   }
 
   @override
