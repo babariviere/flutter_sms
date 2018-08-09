@@ -29,6 +29,10 @@ class ReceivedMessage extends Message {
               ),
               new Expanded(
                 child: new Container(
+                  decoration: new BoxDecoration(
+                    borderRadius: new BorderRadius.circular(10.0),
+                    color: this.backgroundColor
+                  ),
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -47,7 +51,6 @@ class ReceivedMessage extends Message {
                   ),
                   margin: new EdgeInsets.only(right: 48.0),
                   padding: new EdgeInsets.all(10.0),
-                  color: this.backgroundColor,
                 ),
               ),
             ],

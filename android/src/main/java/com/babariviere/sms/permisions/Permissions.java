@@ -16,6 +16,7 @@ public class Permissions {
     public static final int READ_SMS_ID_REQ = 3;
     public static final int READ_CONTACT_ID_REQ = 4;
     public static final int BROADCAST_SMS = 5;
+    public static final int READ_PHONE_STATE = 6;
     private static final PermissionsRequestHandler requestsListener = new PermissionsRequestHandler();
     private final Activity activity;
 

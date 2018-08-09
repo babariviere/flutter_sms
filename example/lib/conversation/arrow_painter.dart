@@ -17,10 +17,10 @@ class ArrowPainter extends CustomPainter {
     Path path = new Path();
 
     if (this.direction == ArrowDirection.Left) {
-      canvas.translate(50.0, 0.0);
+      canvas.translate(56.0, 0.0);
       path.lineTo(-15.0, 0.0);
     } else {
-      canvas.translate(size.width - 50.0, 0.0);
+      canvas.translate(size.width - 56.0, 0.0);
       path.lineTo(15.0, 0.0);
     }
 

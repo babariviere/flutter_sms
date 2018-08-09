@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
+import android.util.Log;
 
 import com.babariviere.sms.permisions.Permissions;
 
@@ -36,14 +37,16 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
     private String address;
     private String body;
     private int sentId;
+    private Integer subId;
     private final Registrar registrar;
 
-    SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, String address, String body, int sentId) {
+    SmsSenderMethodHandler(Registrar registrar, MethodChannel.Result result, String address, String body, int sentId, Integer subId) {
         this.registrar = registrar;
         this.result = result;
         this.address = address;
         this.body = body;
         this.sentId = sentId;
+        this.subId = subId;
     }
 
     void handle(Permissions permissions) {
@@ -74,7 +77,6 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void sendSmsMessage() {
-
         Intent sentIntent = new Intent("SMS_SENT");
         sentIntent.putExtra("sentId", sentId);
         PendingIntent sentPendingIntent = PendingIntent.getBroadcast(
@@ -92,7 +94,17 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
                 deliveredIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
-
+        SmsManager sms;
+        if (this.subId == null) {
+            sms = SmsManager.getDefault();
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                sms = SmsManager.getSmsManagerForSubscriptionId(this.subId);
+            } else {
+                result.error("#03", "this version of android does not support multicard SIM", null);
+                return;
+            }
+        }
         sms.sendTextMessage(address, null, body, sentPendingIntent, deliveredPendingIntent);
         result.success(null);
     }
@@ -114,12 +126,13 @@ class SmsSender implements MethodCallHandler {
             String address = call.argument("address").toString();
             String body = call.argument("body").toString();
             int sentId = call.argument("sentId");
+            Integer subId = call.argument("subId");
             if (address == null) {
                 result.error("#02", "missing argument 'address'", null);
             } else if (body == null) {
                 result.error("#02", "missing argument 'body'", null);
             } else {
-                SmsSenderMethodHandler handler = new SmsSenderMethodHandler(registrar, result, address, body, sentId);
+                SmsSenderMethodHandler handler = new SmsSenderMethodHandler(registrar, result, address, body, sentId, subId);
                 this.registrar.addRequestPermissionsResultListener(handler);
                 handler.handle(this.permissions);
             }
