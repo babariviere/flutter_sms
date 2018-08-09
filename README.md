@@ -24,7 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  sms: ^0.1.4
+  sms: ^0.2.0
 ```
 
 Then run the command `flutter packages get` on the console.

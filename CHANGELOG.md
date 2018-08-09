@@ -1,3 +1,7 @@
+## [0.2.0] - 2018-08-09
+
+* Multi SIM card support
+
 ## [0.1.6] - 2018-08-07
 
 * Fix permission error when sending SMS on Android O and above
