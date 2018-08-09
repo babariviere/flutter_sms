@@ -3,6 +3,7 @@ library sms;
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
@@ -319,7 +320,7 @@ class SmsSender {
   /// Take a message in argument + 2 functions that will be called on success or on error
   ///
   /// This function will not set automatically thread id, you have to do it
-  Future<SmsMessage> sendSms(SmsMessage msg) async {
+  Future<SmsMessage> sendSms(SmsMessage msg, {SimCard simCard}) async {
     if (msg == null || msg.address == null || msg.body == null) {
       if (msg == null) {
         throw ("no given message");
@@ -335,7 +336,14 @@ class SmsSender {
     Map map = msg.toMap;
     this._sentMessages.putIfAbsent(this._sentId, () => msg);
     map['sentId'] = this._sentId;
+    if (simCard != null) {
+      map['subId'] = simCard.slot;
+    }
     this._sentId += 1;
+
+    if (simCard != null) {
+      map['simCard'] = simCard.imei;
+    }
 
     await _channel.invokeMethod("sendSMS", map);
     msg.date = new DateTime.now();
@@ -488,5 +496,86 @@ class SmsQuery {
       threads.add(thread);
     }
     return threads;
+  }
+}
+
+enum SimCardState {
+  Unknown,
+  Absent,
+  PinRequired,
+  PukRequired,
+  Locked,
+  Ready,
+}
+
+/// Represents a device's sim card info
+class SimCard {
+  int slot;
+  String imei;
+  SimCardState state;
+
+  SimCard({
+    @required this.slot,
+    @required this.imei,
+    this.state = SimCardState.Unknown
+  }) : assert(slot != null),
+       assert(imei != null);
+
+  SimCard.fromJson(Map map) {
+    if (map.containsKey('slot')) {
+      this.slot = map['slot'];
+    }
+    if (map.containsKey('imei')) {
+      this.imei = map['imei'];
+    }
+    if (map.containsKey('state')) {
+      switch(map['state']) {
+        case 0:
+          this.state = SimCardState.Unknown;
+          break;
+        case 1:
+          this.state = SimCardState.Absent;
+          break;
+        case 2:
+          this.state = SimCardState.PinRequired;
+          break;
+        case 3:
+          this.state = SimCardState.PukRequired;
+          break;
+        case 4:
+          this.state = SimCardState.Locked;
+          break;
+        case 5:
+          this.state = SimCardState.Ready;
+          break;
+      }
+    }
+  }
+}
+
+class SimCardsProvider {
+  static SimCardsProvider _instance;
+  final MethodChannel _channel;
+
+  factory SimCardsProvider() {
+    if (_instance == null) {
+      final MethodChannel methodChannel = const MethodChannel(
+          "plugins.babariviere.com/simCards", const JSONMethodCodec());
+      _instance = new SimCardsProvider._private(methodChannel);
+    }
+    return _instance;
+  }
+
+  SimCardsProvider._private(this._channel);
+
+  Future<List<SimCard>> getSimCards() async {
+    final simCards = new List<SimCard>();
+
+    dynamic response = await _channel.invokeMethod('getSimCards', null);
+    for(Map map in response) {
+      simCards.add(new SimCard.fromJson(map));
+    }
+
+    return simCards;
   }
 }

@@ -37,12 +37,15 @@ class SentMessage extends Message {
                           ),
                         ),
                         alignment: Alignment.centerRight,
-                      )
+                      ),
                     ],
                   ),
                   margin: new EdgeInsets.only(left: 48.0),
                   padding: new EdgeInsets.all(10.0),
-                  color: this.backgroundColor,
+                  decoration: new BoxDecoration(
+                    borderRadius: new BorderRadius.circular(10.0),
+                    color: this.backgroundColor
+                  ),
                 ),
               ),
               new Container(

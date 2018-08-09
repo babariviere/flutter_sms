@@ -19,7 +19,8 @@ public class SmsPlugin {
     private static final String CHANNEL_QUER = "plugins.babariviere.com/querySMS";
     private static final String CHANNEL_QUER_CONT = "plugins.babariviere.com/queryContact";
     private static final String CHANNEL_QUER_CONT_PHOTO = "plugins.babariviere.com/queryContactPhoto";
-    private static final String USER_PROFILE = "plugins.babariviere.com/userProfile";
+    private static final String CHANNEL_USER_PROFILE = "plugins.babariviere.com/userProfile";
+    private static final String CHANNEL_SIM_CARDS = "plugins.babariviere.com/simCards";
 
     /**
      * Plugin registration.
@@ -61,7 +62,11 @@ public class SmsPlugin {
 
         /// User Profile
         final UserProfileProvider userProfileProvider = new UserProfileProvider(registrar);
-        final MethodChannel userProfileProviderChannel = new MethodChannel(registrar.messenger(), USER_PROFILE, JSONMethodCodec.INSTANCE);
+        final MethodChannel userProfileProviderChannel = new MethodChannel(registrar.messenger(), CHANNEL_USER_PROFILE, JSONMethodCodec.INSTANCE);
         userProfileProviderChannel.setMethodCallHandler(userProfileProvider);
+
+        //Sim Cards Provider
+        new MethodChannel(registrar.messenger(), CHANNEL_SIM_CARDS, JSONMethodCodec.INSTANCE)
+                .setMethodCallHandler(new SimCardsProvider(registrar));
     }
 }
