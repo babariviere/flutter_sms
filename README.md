@@ -178,6 +178,18 @@ sender.onSmsDelivered.listen((SmsMessage message){
 }
 ```
 
+You can also send with another SimCard:
+
+```dart
+void main() {
+SimCardsProvider provider = new SimCardsProvider();
+SimCard card = await provider.getSimCards()[0];
+SmsSender sender = new SmsSender();
+SmsMessage message = new SmsMessage("address", "message");
+sender.sendSMS(message, simCard: card);
+}
+```
+
 **Note**: Using the `onSmsDelivered` from the `SmsSender` will only notify to listeners of messages that has been sent through `SmsSender.send()`.
 
 ## Receiving SMS
