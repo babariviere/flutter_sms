@@ -1,3 +1,7 @@
+## [0.2.1] - 2018-08-13
+
+* Fix issue with `toString` on error
+
 ## [0.2.0] - 2018-08-09
 
 * Multi SIM card support

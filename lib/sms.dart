@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:sms/contact.dart';
 
+typedef OnError(Object error);
+
 enum SmsMessageState {
   Sending,
   Sent,
@@ -307,10 +309,7 @@ class SmsSender {
   }
 
   SmsSender._private(this._channel, this._stateChannel) {
-    _stateChannel.receiveBroadcastStream().listen(this._onSmsStateChanged,
-        onError: (Object error) {
-      print('Error from Platform wen listening sms state changes: ' + error);
-    });
+    _stateChannel.receiveBroadcastStream().listen(this._onSmsStateChanged);
 
     _sentMessages = new Map<int, SmsMessage>();
   }
