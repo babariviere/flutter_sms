@@ -1,3 +1,7 @@
+## [0.2.2] - 2018-09-05
+
+* Update dart version
+
 ## [0.2.1] - 2018-08-13
 
 * Fix issue with `toString` on error
