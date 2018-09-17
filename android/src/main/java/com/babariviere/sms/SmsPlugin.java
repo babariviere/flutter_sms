@@ -21,6 +21,7 @@ public class SmsPlugin {
     private static final String CHANNEL_QUER_CONT_PHOTO = "plugins.babariviere.com/queryContactPhoto";
     private static final String CHANNEL_USER_PROFILE = "plugins.babariviere.com/userProfile";
     private static final String CHANNEL_SIM_CARDS = "plugins.babariviere.com/simCards";
+    private static final String CHANNEL_SMS_DB = "plugins.babariviere.com/smsDb";
 
     /**
      * Plugin registration.
@@ -68,5 +69,10 @@ public class SmsPlugin {
         //Sim Cards Provider
         new MethodChannel(registrar.messenger(), CHANNEL_SIM_CARDS, JSONMethodCodec.INSTANCE)
                 .setMethodCallHandler(new SimCardsProvider(registrar));
+
+        /// Sms DB
+        final SmsDb smsdb = new SmsDb(registrar);
+        final MethodChannel smsDbChannel = new MethodChannel(registrar.messenger(), CHANNEL_SMS_DB, JSONMethodCodec.INSTANCE);
+        smsDbChannel.setMethodCallHandler(smsdb);
     }
 }

@@ -6,6 +6,8 @@ import android.os.Build;
 
 import io.flutter.plugin.common.PluginRegistry;
 
+import static io.flutter.plugin.common.PluginRegistry.*;
+
 /**
  * Created by babariviere on 08/03/18.
  */
@@ -38,7 +40,7 @@ public class Permissions {
         return true;
     }
 
-    public static PluginRegistry.RequestPermissionsResultListener getRequestsResultsListener() {
+    public static RequestPermissionsResultListener getRequestsResultsListener() {
         return requestsListener;
     }
 

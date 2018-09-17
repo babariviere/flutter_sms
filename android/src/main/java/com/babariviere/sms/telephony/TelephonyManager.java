@@ -21,6 +21,7 @@ public class TelephonyManager {
         return this.getManager().getPhoneCount();
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     public String getSimId(int slotId) {
         return this.getManager().getDeviceId(slotId);
     }
