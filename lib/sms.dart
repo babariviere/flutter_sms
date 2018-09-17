@@ -76,7 +76,7 @@ class SmsMessage implements Comparable<SmsMessage> {
       this._read = data["read"] as int == 1;
     }
     if (data.containsKey("kind")) {
-      this._kind = data["kind"];
+      this._kind = SmsMessageKind.values[data["kind"]];
     }
     if (data.containsKey("date")) {
       this._date = new DateTime.fromMillisecondsSinceEpoch(data["date"]);
@@ -110,6 +110,9 @@ class SmsMessage implements Comparable<SmsMessage> {
     }
     if (_dateSent != null) {
       res["dateSent"] = _dateSent.millisecondsSinceEpoch;
+    }
+    if (_kind != null) {
+      res["kind"] = _kind.index;
     }
     return res;
   }
@@ -576,5 +579,26 @@ class SimCardsProvider {
     }
 
     return simCards;
+  }
+}
+
+class SmsDb {
+  static SmsDb _instance;
+  final MethodChannel _channel;
+
+  factory SmsDb() {
+    if (_instance == null) {
+      final MethodChannel methodChannel = const MethodChannel(
+        "plugins.babariviere.com/smsDb", const JSONMethodCodec()
+      );
+      _instance = new SmsDb._private(methodChannel);
+    }
+    return _instance;
+  }
+
+  SmsDb._private(this._channel);
+
+  Future<Null> insert(SmsMessage message) {
+    return this._channel.invokeMethod("insert", message.toMap);
   }
 }
