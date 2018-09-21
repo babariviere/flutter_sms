@@ -42,8 +42,8 @@ class SmsMessage implements Comparable<SmsMessage> {
       {int id,
       int threadId,
       bool read,
-      @required DateTime date,
-      @required DateTime dateSent,
+      DateTime date,
+      DateTime dateSent,
       SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
@@ -600,12 +600,18 @@ class SmsDb {
   /// Inserts an SMS into the phone's database.
   /// [message] must include address, body, date, dateSent, read and kind.
   Future insert(SmsMessage message) {
-    assert(message.address != null);
-    assert(message.body != null);
-    assert(message.date != null);
-    assert(message.dateSent != null);
-    assert(message.isRead != null);
-    assert(message.kind != null);
+    assert(message.address != null,
+        "Could not insert SMS because address is required and cannot be null.");
+    assert(message.body != null,
+        "Could not insert SMS because body is required and cannot be null.");
+    assert(message.date != null,
+        "Could not insert SMS because date is required and cannot be null.");
+    assert(message.dateSent != null,
+        "Could not insert SMS because dateSent is required and cannot be null.");
+    assert(message.isRead != null,
+        "Could not insert SMS because isRead is required and cannot be null.");
+    assert(message.kind != null,
+        "Could not insert SMS because kind is required and cannot be null.");
     Map messageMap = message.toMap;
     switch (message.kind) {
       case SmsMessageKind.Sent:
