@@ -29,13 +29,16 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
 
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-        if (methodCall.method == "insert") {
+        Log.d(TAG, "onMethodCall: "+ methodCall.method);
+        if (methodCall.method.equals("insert")) {
+            Log.d(TAG, "onMethodCall: insert reached. Adding variables.");
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
             this.date = methodCall.argument("date");
             this.dateSent = methodCall.argument("dateSent");
             this.read = methodCall.argument("read");
             this.kind = methodCall.argument("kind");
+            Log.d(TAG, "onMethodCall: Variables added, calling insertMessage");
             insertMessage(result);
         } else {
             result.notImplemented();

@@ -599,13 +599,34 @@ class SmsDb {
 
   /// Inserts an SMS into the phone's database.
   /// [message] must include address, body, date, dateSent, read and kind.
-  Future<Null> insert(SmsMessage message) {
+  Future insert(SmsMessage message) {
     assert(message.address != null);
     assert(message.body != null);
     assert(message.date != null);
     assert(message.dateSent != null);
     assert(message.isRead != null);
     assert(message.kind != null);
-    return this._channel.invokeMethod("insert", message.toMap);
+    Map messageMap = message.toMap;
+    switch (message.kind) {
+      case SmsMessageKind.Sent:
+        {
+          messageMap['kind'] = 0;
+          break;
+        }
+      case SmsMessageKind.Received:
+        {
+          messageMap['kind'] = 1;
+          break;
+        }
+      case SmsMessageKind.Draft:
+        {
+          messageMap['kind'] = 2;
+          break;
+        }
+      default:
+        messageMap['kind'] = 2;
+    }
+    messageMap['read'] = messageMap['read'] == true ? 1 : 0;
+    return this._channel.invokeMethod("insert", messageMap);
   }
 }
