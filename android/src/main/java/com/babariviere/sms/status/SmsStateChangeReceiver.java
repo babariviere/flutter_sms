@@ -6,13 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.provider.Telephony;
-import android.telephony.SmsMessage;
+import android.telephony.SmsManager;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Arrays;
 
 import io.flutter.plugin.common.EventChannel;
 
@@ -30,35 +28,48 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (getResultCode() == Activity.RESULT_OK) {
-            //SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
-            try {
-                JSONObject stateChange = new JSONObject();
-                stateChange.put("sentId", intent.getIntExtra("sentId", -1));
-                String action = intent.getAction();
+        try {
+            JSONObject stateChange = new JSONObject();
+            stateChange.put("sentId", intent.getIntExtra("sentId", -1));
+            String action = intent.getAction();
 
-                switch (action != null ? action : "none") {
-                    case "SMS_SENT": {
-                        stateChange.put("state", "sent");
-                        break;
-                    }
-                    case "SMS_DELIVERED": {
-                        stateChange.put("state", "delivered");
-                        break;
-                    }
-                    default: {
-                        stateChange.put("state", "none");
-                    }
+            switch (action != null ? action : "none") {
+                case "SMS_SENT": {
+                    stateChange.put("state", "sent");
+                    Log.d("flutter_sms", "Sent result: " + sentResult(getResultCode()));
+                    break;
                 }
-
-                eventSink.success(stateChange);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                eventSink.error("#01", e.getMessage(), null);
+                case "SMS_DELIVERED": {
+                    stateChange.put("state", "delivered");
+                    break;
+                }
+                default: {
+                    stateChange.put("state", "none");
+                }
             }
-        } else {
-            eventSink.error("#01", "message state change error", null);
+
+            eventSink.success(stateChange);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            eventSink.error("#01", e.getMessage(), null);
+        }
+    }
+
+    String sentResult(int resultCode) {
+        switch (resultCode) {
+            case Activity.RESULT_OK:
+                return "Activity.RESULT_OK";
+            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                return "SmsManager.RESULT_ERROR_GENERIC_FAILURE";
+            case SmsManager.RESULT_ERROR_RADIO_OFF:
+                return "SmsManager.RESULT_ERROR_RADIO_OFF";
+            case SmsManager.RESULT_ERROR_NULL_PDU:
+                return "SmsManager.RESULT_ERROR_NULL_PDU";
+            case SmsManager.RESULT_ERROR_NO_SERVICE:
+                return "SmsManager.RESULT_ERROR_NO_SERVICE";
+            default:
+                return "Unknown error code";
         }
     }
 }
