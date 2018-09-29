@@ -1,3 +1,7 @@
+## [0.2.3] - 2018-09-29
+
+* Fix issue with SMS state handler
+
 ## [0.2.2] - 2018-09-05
 
 * Update dart version
