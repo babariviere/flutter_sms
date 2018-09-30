@@ -1,3 +1,7 @@
+## [0.2.4] - 2018-09-30
+
+* Add fail state
+
 ## [0.2.3] - 2018-09-29
 
 * Fix issue with SMS state handler

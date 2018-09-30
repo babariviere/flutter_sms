@@ -13,6 +13,7 @@ enum SmsMessageState {
   Sending,
   Sent,
   Delivered,
+  Fail,
   None,
 }
 
@@ -365,6 +366,12 @@ class SmsSender {
           {
             _sentMessages[id].state = SmsMessageState.Delivered;
             _deliveredStreamController.add(_sentMessages[id]);
+            _sentMessages.remove(id);
+            break;
+          }
+        case 'fail':
+          {
+            _sentMessages[id].state = SmsMessageState.Fail;
             _sentMessages.remove(id);
             break;
           }

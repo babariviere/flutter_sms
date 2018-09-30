@@ -35,7 +35,11 @@ public class SmsStateChangeReceiver extends BroadcastReceiver {
 
             switch (action != null ? action : "none") {
                 case "SMS_SENT": {
-                    stateChange.put("state", "sent");
+                    if (getResultCode() != Activity.RESULT_OK) {
+                        stateChange.put("state", "fail");
+                    } else {
+                        stateChange.put("state", "sent");
+                    }
                     Log.d("flutter_sms", "Sent result: " + sentResult(getResultCode()));
                     break;
                 }
