@@ -166,18 +166,22 @@ class SmsMessage implements Comparable<SmsMessage> {
 class SmsReceiver {
   static SmsReceiver _instance;
   final EventChannel _channel;
+  final MethodChannel _methodChannel;
   Stream<SmsMessage> _stream;
 
   factory SmsReceiver() {
     if (_instance == null) {
       final EventChannel eventChannel = const EventChannel(
           "plugins.babariviere.io/receiveSMS", const JSONMethodCodec());
-      _instance = new SmsReceiver._private(eventChannel);
+      final MethodChannel methodChannel = const MethodChannel(
+        "plugins.babariviere.io/receiveSMSmeth", const JSONMethodCodec()
+      );
+      _instance = new SmsReceiver._private(eventChannel, methodChannel);
     }
     return _instance;
   }
 
-  SmsReceiver._private(this._channel);
+  SmsReceiver._private(this._channel, this._methodChannel);
 
   /// Legacy function for received SMS
   @deprecated
@@ -200,6 +204,11 @@ class SmsReceiver {
   /// Listen for SMS
   StreamSubscription<SmsMessage> listen(void onData(SmsMessage sms)) {
     return this.stream.listen(onData);
+  }
+
+  /// Get needed permissions
+  Future<List<String>> permissions() {
+    return _methodChannel.invokeMethod("permissions", null);
   }
 }
 
@@ -297,5 +306,10 @@ class SmsSender {
           }
       }
     }
+  }
+
+  /// Get needed permissions
+  Future<List<String>> permissions() {
+    return _sendChannel.invokeMethod("permissions", null);
   }
 }
