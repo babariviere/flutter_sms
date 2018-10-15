@@ -1,19 +1,15 @@
 package com.babariviere.sms;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
-
-import com.babariviere.sms.permisions.Permissions;
 
 import org.json.JSONObject;
 
@@ -21,7 +17,6 @@ import java.util.Date;
 
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
-import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
 
 import static io.flutter.plugin.common.PluginRegistry.Registrar;
 
@@ -29,17 +24,17 @@ import static io.flutter.plugin.common.PluginRegistry.Registrar;
  * Created by babariviere on 08/03/18.
  */
 
-class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
+class SmsReceiver implements StreamHandler {
   private final Registrar registrar;
   private BroadcastReceiver receiver;
-  private final Permissions permissions;
-  private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS};
+//  private final Permissions permissions;
+//  private final String[] permissionsList = new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS};
   private EventSink sink;
 
   SmsReceiver(Registrar registrar) {
     this.registrar = registrar;
-    this.permissions = new Permissions(registrar.activity());
-    registrar.addRequestPermissionsResultListener(this);
+//    this.permissions = new Permissions(registrar.activity());
+//    registrar.addRequestPermissionsResultListener(this);
   }
 
   @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -48,7 +43,7 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
     receiver = createSmsReceiver(events);
     registrar.context().registerReceiver(receiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
     sink = events;
-    permissions.checkAndRequestPermission(permissionsList, Permissions.RECV_SMS_ID_REQ);
+//    permissions.checkAndRequestPermission(permissionsList, Permissions.RECV_SMS_ID_REQ);
   }
 
   @Override
@@ -95,22 +90,22 @@ class SmsReceiver implements StreamHandler, RequestPermissionsResultListener {
     };
   }
 
-  @Override
-  public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    if (requestCode != Permissions.RECV_SMS_ID_REQ) {
-      return false;
-    }
-    boolean isOk = true;
-    for (int res: grantResults) {
-      if (res != PackageManager.PERMISSION_GRANTED) {
-        isOk = false;
-        break;
-      }
-    }
-    if (isOk) {
-      return true;
-    }
-    sink.endOfStream();
-    return false;
-  }
+//  @Override
+//  public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//    if (requestCode != Permissions.RECV_SMS_ID_REQ) {
+//      return false;
+//    }
+//    boolean isOk = true;
+//    for (int res: grantResults) {
+//      if (res != PackageManager.PERMISSION_GRANTED) {
+//        isOk = false;
+//        break;
+//      }
+//    }
+//    if (isOk) {
+//      return true;
+//    }
+//    sink.endOfStream();
+//    return false;
+//  }
 }
