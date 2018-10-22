@@ -1,5 +1,7 @@
 ![xxhdpi](https://user-images.githubusercontent.com/37498811/41118114-d9cad440-6ab0-11e8-9254-68d6aac245be.png)
 
+# [UNMAINTAINED] This project is unmaintained, if you want the package name `sms` send me a mail at babathriviere@gmail.com
+
 
 # Flutter SMS
 
